@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
-import '../styles/PDFUploader.css';
+import { Card } from '@/components/ui/card';
+import { Upload, FileText } from 'lucide-react';
 
 interface PDFUploaderProps {
     onFileSelect: (file: File) => void;
@@ -32,8 +33,8 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ onFileSelect }) => {
     };
 
     return (
-        <div
-            className="pdf-uploader"
+        <Card
+            className="w-full max-w-2xl flex flex-col items-center justify-center p-16 border-2 border-dashed border-slate-200 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:border-indigo-400 hover:bg-slate-50 cursor-pointer group"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => fileInputRef.current?.click()}
@@ -43,27 +44,24 @@ const PDFUploader: React.FC<PDFUploaderProps> = ({ onFileSelect }) => {
                 type="file"
                 accept="application/pdf"
                 onChange={handleFileChange}
-                style={{ display: 'none' }}
+                className="hidden"
             />
-            <div className="upload-content">
-                <svg
-                    className="upload-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                </svg>
-                <h2>Upload PDF Document</h2>
-                <p>Click to browse or drag and drop your PDF file here</p>
-                <p className="file-hint">Supports: .pdf files</p>
+            <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200">
+                <Upload className="w-10 h-10 text-indigo-500" />
             </div>
-        </div>
+
+            <h2 className="text-2xl font-semibold text-slate-800 mb-2">Upload Document</h2>
+            <p className="text-slate-500 text-center max-w-sm mb-8">
+                Drag and drop your PDF here, or click to browse files.
+            </p>
+
+            <div className="flex gap-4 text-sm text-slate-400">
+                <div className="flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    <span>PDF Support</span>
+                </div>
+            </div>
+        </Card>
     );
 };
 

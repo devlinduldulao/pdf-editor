@@ -1,5 +1,6 @@
 import React from 'react';
-import '../styles/MenuBar.css';
+import { Button } from '@/components/ui/button';
+import { FilePlus, Save, LayoutTemplate, Share, FileUp } from 'lucide-react';
 
 interface MenuBarProps {
     onSave: () => void;
@@ -10,33 +11,47 @@ interface MenuBarProps {
 
 const MenuBar: React.FC<MenuBarProps> = ({ onSave, onSaveAs, onNew, hasDocument }) => {
     return (
-        <div className="menu-bar">
-            <div className="menu-bar-left">
-                <h1 className="app-title">PDF Editor</h1>
+        <header className="flex justify-between items-center px-6 py-3 bg-slate-900 text-white border-b border-slate-800 h-16 shrink-0 z-50">
+            <div className="flex items-center gap-2">
+                <LayoutTemplate className="w-5 h-5 text-indigo-400" />
+                <h1 className="text-lg font-semibold tracking-wide">PDF<span className="text-indigo-400">Editor</span></h1>
             </div>
-            <div className="menu-bar-right">
-                <button
-                    className="menu-btn"
+
+            <div className="flex items-center gap-2">
+                <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={onNew}
+                    className="text-slate-300 hover:text-white hover:bg-slate-800 gap-2 h-9"
                 >
-                    📄 New
-                </button>
-                <button
-                    className="menu-btn"
+                    <FilePlus className="w-4 h-4" />
+                    New
+                </Button>
+
+                <div className="w-px h-6 bg-slate-700 mx-2" />
+
+                <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={onSave}
                     disabled={!hasDocument}
+                    className="text-slate-300 hover:text-white hover:bg-slate-800 gap-2 h-9 disabled:opacity-40"
                 >
-                    💾 Save
-                </button>
-                <button
-                    className="menu-btn"
+                    <Save className="w-4 h-4" />
+                    Save
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
                     onClick={onSaveAs}
                     disabled={!hasDocument}
+                    className="text-slate-300 hover:text-white hover:bg-slate-800 gap-2 h-9 disabled:opacity-40"
                 >
-                    📋 Save As
-                </button>
+                    <Share className="w-4 h-4" />
+                    Export
+                </Button>
             </div>
-        </div>
+        </header>
     );
 };
 

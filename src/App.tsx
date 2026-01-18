@@ -3,7 +3,6 @@ import MenuBar from './components/MenuBar';
 import PDFUploader from './components/PDFUploader';
 import PDFViewer from './components/PDFViewer';
 import { pdfEditorService } from './services/pdfEditor';
-import './App.css';
 
 function App() {
   const [currentFile, setCurrentFile] = useState<File | null>(null);
@@ -50,18 +49,22 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className="flex flex-col h-screen overflow-hidden bg-slate-100 font-sans text-slate-900">
       <MenuBar
         onSave={handleSave}
         onSaveAs={handleSaveAs}
         onNew={handleNew}
         hasDocument={!!currentFile}
       />
-      {currentFile ? (
-        <PDFViewer file={currentFile} />
-      ) : (
-        <PDFUploader onFileSelect={handleFileSelect} />
-      )}
+      <main className="flex-1 relative overflow-hidden flex flex-col">
+        {currentFile ? (
+          <PDFViewer file={currentFile} />
+        ) : (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <PDFUploader onFileSelect={handleFileSelect} />
+          </div>
+        )}
+      </main>
     </div>
   );
 }

@@ -22,13 +22,20 @@ export class PDFEditorService {
   async addText(annotation: TextAnnotation): Promise<void> {
     if (!this.pdfDoc) throw new Error("No PDF loaded");
 
+    // Skip empty text
+    if (!annotation.text || annotation.text.trim() === "") {
+      console.log("Skipping empty text annotation");
+      return;
+    }
+
     const pages = this.pdfDoc.getPages();
     const page = pages[annotation.pageNumber - 1];
-    const { height } = page.getSize();
+
+    console.log("Adding text:", annotation);
 
     page.drawText(annotation.text, {
       x: annotation.x,
-      y: height - annotation.y,
+      y: annotation.y,
       size: annotation.fontSize || 12,
       color: rgb(0, 0, 0),
     });

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import '../styles/PDFEditor.css';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface TextAnnotation {
     id: string;
@@ -47,43 +49,62 @@ const PDFEditor: React.FC<PDFEditorProps> = ({ onAnnotationAdd }) => {
     };
 
     return (
-        <div className="pdf-editor-tools">
-            <div className="toolbar">
-                <button
-                    className={`tool-btn ${isAddingText ? 'active' : ''}`}
+        <div className="relative">
+            <div className="flex items-center gap-3 px-6 py-3 bg-white border-b border-slate-200 shadow-sm">
+                <Button
+                    variant={isAddingText ? 'default' : 'outline'}
+                    size="sm"
                     onClick={() => setIsAddingText(!isAddingText)}
                     title="Add Text"
+                    className={isAddingText ? 'bg-purple-600 hover:bg-purple-700' : ''}
                 >
                     📝 Add Text
-                </button>
-                <div className="font-size-control">
-                    <label>Font Size:</label>
-                    <input
+                </Button>
+                <div className="flex items-center gap-2">
+                    <Label className="text-sm font-medium text-slate-800">Font Size:</Label>
+                    <Input
                         type="number"
                         min="8"
                         max="72"
                         value={fontSize}
                         onChange={(e) => setFontSize(Number(e.target.value))}
+                        className="w-16 h-8"
                     />
                 </div>
             </div>
 
             {showTextInput && (
-                <div className="text-input-dialog" style={{ top: position.y, left: position.x }}>
-                    <input
+                <div
+                    className="absolute bg-white border-2 border-purple-600 rounded-lg p-3 shadow-xl z-50 min-w-[250px]"
+                    style={{ top: position.y, left: position.x }}
+                >
+                    <Input
                         type="text"
                         value={textInput}
                         onChange={(e) => setTextInput(e.target.value)}
                         placeholder="Enter text..."
                         autoFocus
                         onKeyPress={(e) => e.key === 'Enter' && handleAddText()}
+                        className="mb-2"
                     />
-                    <div className="dialog-buttons">
-                        <button onClick={handleAddText}>Add</button>
-                        <button onClick={() => {
-                            setShowTextInput(false);
-                            setIsAddingText(false);
-                        }}>Cancel</button>
+                    <div className="flex gap-2 justify-end">
+                        <Button
+                            onClick={handleAddText}
+                            size="sm"
+                            className="bg-purple-600 hover:bg-purple-700"
+                        >
+                            Add
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setShowTextInput(false);
+                                setIsAddingText(false);
+                            }}
+                            variant="outline"
+                            size="sm"
+                        >
+                            Cancel
+                        </Button>
                     </div>
                 </div>
             )}
