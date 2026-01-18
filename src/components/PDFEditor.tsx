@@ -49,7 +49,7 @@ const PDFEditor: React.FC<PDFEditorProps> = ({ onAnnotationAdd }) => {
     };
 
     return (
-        <div className="relative">
+        <div className="relative" onClick={handleCanvasClick}>
             <div className="flex items-center gap-3 px-6 py-3 bg-white border-b border-slate-200 shadow-sm">
                 <Button
                     variant={isAddingText ? 'default' : 'outline'}

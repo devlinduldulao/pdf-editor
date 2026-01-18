@@ -11,8 +11,7 @@ import {
     ZoomOut,
     Type,
     MousePointer2,
-    Check,
-    AlertCircle
+    Check
 } from 'lucide-react';
 
 // Set worker path - using local worker file
@@ -51,7 +50,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
     const [textAnnotations, setTextAnnotations] = useState<TextAnnotation[]>([]);
     const [isAddingText, setIsAddingText] = useState<boolean>(false);
-    const [fontSize, setFontSize] = useState<number>(12);
+    const fontSize = 12;
 
     useEffect(() => {
         if (!file) return;
@@ -350,7 +349,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                 <div className="flex items-center gap-4">
                     <div className="flex items-center bg-slate-100 p-1 rounded-lg">
                         <Button
-                            variant={!isAddingText ? 'white' : 'ghost'}
+                            variant="ghost"
                             size="sm"
                             onClick={() => setIsAddingText(false)}
                             className={`h-8 px-3 gap-2 border-0 ${!isAddingText ? 'bg-white shadow-sm text-slate-900 font-medium' : 'bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}
@@ -359,7 +358,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                             <span className="text-xs">Select</span>
                         </Button>
                         <Button
-                            variant={isAddingText ? 'white' : 'ghost'}
+                            variant="ghost"
                             size="sm"
                             onClick={() => setIsAddingText(true)}
                             className={`h-8 px-3 gap-2 border-0 ${isAddingText ? 'bg-white shadow-sm text-indigo-600 font-medium' : 'bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'}`}

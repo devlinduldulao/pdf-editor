@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { FilePlus, Save, LayoutTemplate, Share, FileUp } from 'lucide-react';
+import { FilePlus, Save, LayoutTemplate, Share } from 'lucide-react';
 
 interface MenuBarProps {
     onSave: () => void;

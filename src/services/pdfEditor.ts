@@ -65,7 +65,8 @@ export class PDFEditorService {
 
   async downloadPDF(filename: string = "edited-document.pdf"): Promise<void> {
     const pdfBytes = await this.savePDF();
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+    const safeBytes = new Uint8Array(pdfBytes);
+    const blob = new Blob([safeBytes], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
 
     const link = document.createElement("a");
