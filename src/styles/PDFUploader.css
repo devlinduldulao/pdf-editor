@@ -1,0 +1,51 @@
+.pdf-uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 500px;
+  border: 3px dashed #cbd5e0;
+  border-radius: 12px;
+  margin: 40px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f6f8fb 0%, #ffffff 100%);
+}
+
+.pdf-uploader:hover {
+  border-color: #667eea;
+  background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+}
+
+.upload-content {
+  text-align: center;
+  padding: 40px;
+}
+
+.upload-icon {
+  width: 80px;
+  height: 80px;
+  color: #667eea;
+  margin-bottom: 20px;
+}
+
+.upload-content h2 {
+  font-size: 1.8rem;
+  color: #2d3748;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.upload-content p {
+  color: #718096;
+  font-size: 1.1rem;
+  margin: 8px 0;
+}
+
+.file-hint {
+  font-size: 0.9rem;
+  color: #a0aec0;
+  margin-top: 16px;
+}
