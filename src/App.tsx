@@ -98,7 +98,9 @@ function App() {
   const handlePrint = useCallback(async () => {
     try {
       const pdfBytes = await pdfEditorService.savePDF();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([pdfBytes as BlobPart], {
+        type: "application/pdf",
+      });
       const url = URL.createObjectURL(blob);
 
       // Create hidden iframe for printing

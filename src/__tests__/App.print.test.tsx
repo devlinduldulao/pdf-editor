@@ -63,8 +63,8 @@ describe("App - Print Functionality", () => {
     // Mock URL.createObjectURL and URL.revokeObjectURL
     mockCreateObjectURL = vi.fn(() => "blob:mock-url");
     mockRevokeObjectURL = vi.fn();
-    global.URL.createObjectURL = mockCreateObjectURL;
-    global.URL.revokeObjectURL = mockRevokeObjectURL;
+    window.URL.createObjectURL = mockCreateObjectURL as any;
+    window.URL.revokeObjectURL = mockRevokeObjectURL as any;
 
     // Mock iframe creation
     mockPrint = vi.fn();
@@ -174,7 +174,7 @@ describe("App - Print Functionality", () => {
       const mockPdfWithAnnotations = new Uint8Array([
         37, 80, 68, 70, 45, 49, 46, 55, 10, 37, 226, 227, 207, 211,
       ]);
-      vi.mocked(pdfEditorService.savePDF).mockReturnValueOnce(
+      vi.mocked(pdfEditorService.savePDF).mockResolvedValueOnce(
         mockPdfWithAnnotations,
       );
 
