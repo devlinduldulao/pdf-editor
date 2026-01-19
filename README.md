@@ -10,7 +10,7 @@
     <img src="https://github.com/devlinduldulao/pdf-editor/workflows/CI/badge.svg" alt="CI Status">
   </a>
   <a href="https://vercel.com">
-    <img src="https://vercel-badge.vercel.app/api/pdf-editor" alt="Vercel Deployment Status">
+    <img src="https://img.shields.io/badge/Deployed_on-Vercel-000000?logo=vercel&logoColor=white" alt="Deployed on Vercel">
   </a>
 </p>
 
