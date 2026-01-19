@@ -24,6 +24,9 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
+    if (typeof window === "undefined" || typeof localStorage === "undefined") {
+      return "system";
+    }
     const stored = localStorage.getItem("theme");
     return (stored as Theme) || "system";
   });
@@ -33,6 +36,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const root = document.documentElement;
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -65,7 +70,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
-    localStorage.setItem("theme", newTheme);
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+      localStorage.setItem("theme", newTheme);
+    }
   };
 
   return (

@@ -26,27 +26,45 @@ export class PDFEditorService {
   private originalBytes: Uint8Array | null = null;
   private password: string | undefined = undefined;
 
+  getPassword(): string | undefined {
+    return this.password;
+  }
+
   async loadPDF(file: File, password?: string): Promise<void> {
     const arrayBuffer = await file.arrayBuffer();
     this.originalBytes = new Uint8Array(arrayBuffer);
     this.password = password;
     
     try {
-      // Try to load with password if provided, otherwise try without
-      const options = password ? { password, ignoreEncryption: false } : {};
-      this.pdfDoc = await PDFDocument.load(this.originalBytes, options);
+      // Try to load PDF
+      // Note: pdf-lib doesn't support decrypting password-protected PDFs
+      // We can only load them with ignoreEncryption: true if we have the password
+      if (password) {
+        // If password provided, try to load with ignoreEncryption
+        // This allows viewing but may have limitations for editing
+        this.pdfDoc = await PDFDocument.load(this.originalBytes, { 
+          ignoreEncryption: true,
+          updateMetadata: false 
+        });
+      } else {
+        // Try without password first
+        this.pdfDoc = await PDFDocument.load(this.originalBytes, {
+          updateMetadata: false
+        });
+      }
     } catch (error: any) {
-      // Check if it's an encryption/password error
+      console.error("PDF Load Error:", error);
+      
       const errorMsg = error.message?.toLowerCase() || '';
-      if (
-        errorMsg.includes('encrypted') ||
-        errorMsg.includes('password') ||
-        errorMsg.includes('decrypt') ||
-        errorMsg.includes('security')
-      ) {
+      const errorName = error.constructor?.name || '';
+      
+      // Check if it's an EncryptedPDFError
+      if (errorName === 'EncryptedPDFError' || errorMsg.includes('encrypted')) {
+        // PDF is encrypted and needs a password
         throw new Error('PDF_PASSWORD_REQUIRED');
       }
-      // Re-throw other errors
+      
+      // Re-throw other errors as-is
       throw error;
     }
   }

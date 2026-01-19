@@ -77,15 +77,24 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     const loadPDF = async () => {
       const attemptLoad = async (password?: string): Promise<any> => {
         const arrayBuffer = await file.arrayBuffer();
+
+        // Get the password from the service if it was already provided
+        const servicePassword = pdfEditorService.getPassword();
+        const finalPassword = password || servicePassword;
+
         const loadingTask = pdfjsLib.getDocument({
           data: arrayBuffer,
-          password: password,
+          password: finalPassword,
         });
 
-        // Handle password requests
+        // Handle password requests from PDF.js
         loadingTask.onPassword = (updatePassword: any, reason: number) => {
           if (reason === 1) {
-            // Need password
+            // Need password - but if service already has it, don't prompt again
+            if (servicePassword) {
+              updatePassword(servicePassword);
+              return;
+            }
             const pwd = prompt("This PDF requires a password to view:");
             if (pwd) {
               updatePassword(pwd);

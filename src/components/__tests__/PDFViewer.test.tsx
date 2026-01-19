@@ -27,6 +27,7 @@ vi.mock("@/services/pdfEditor", () => ({
     fillFormField: vi.fn(),
     addText: vi.fn(),
     addImage: vi.fn(),
+    getPassword: vi.fn(() => undefined),
   },
 }));
 

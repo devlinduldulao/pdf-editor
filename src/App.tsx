@@ -17,16 +17,11 @@ function App() {
         return true;
       } catch (error: any) {
         console.error("Error loading PDF:", error);
-        // Check if it's a password-related error
-        const errorMsg = error.message?.toLowerCase() || "";
-        if (
-          errorMsg.includes("password") ||
-          errorMsg.includes("encrypted") ||
-          errorMsg.includes("decrypt") ||
-          errorMsg === "pdf_password_required"
-        ) {
+        // Check if it's specifically the password required error
+        if (error.message === "PDF_PASSWORD_REQUIRED") {
           return false;
         }
+        // For other errors, throw them
         throw error;
       }
     };
@@ -56,9 +51,23 @@ function App() {
           }
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading PDF:", error);
-      alert("Failed to load PDF file");
+
+      const errorMessage = error.message || String(error);
+
+      // If it's a parsing error or object ref error, inform the user specifically
+      if (
+        errorMessage.includes("Invalid object ref") ||
+        errorMessage.includes("parse")
+      ) {
+        alert(
+          "Parse Error: The PDF file structure is invalid or not supported by the editor.",
+        );
+        return; // Stop processing
+      }
+
+      alert("Failed to load PDF file: " + errorMessage);
     }
   }, []);
 
