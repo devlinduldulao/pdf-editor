@@ -9,6 +9,16 @@ export interface TextAnnotation {
   fontSize?: number;
 }
 
+export interface ImageAnnotation {
+  id: string;
+  imageData: string; // Base64 data
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  pageNumber: number;
+}
+
 export class PDFEditorService {
   private pdfDoc: PDFDocument | null = null;
   private originalBytes: Uint8Array | null = null;
@@ -41,13 +51,47 @@ export class PDFEditorService {
     });
   }
 
+  async addImage(annotation: ImageAnnotation): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+    const page = pages[annotation.pageNumber - 1];
+
+    console.log("Adding image:", annotation.id);
+
+    try {
+      // imageData is expected to be a data URL: "data:image/png;base64,..."
+      const imageDataPart = annotation.imageData.split(",")[1];
+      const imageBytes = Uint8Array.from(atob(imageDataPart), (c) =>
+        c.charCodeAt(0),
+      );
+
+      let embeddedImage;
+      if (annotation.imageData.includes("image/png")) {
+        embeddedImage = await this.pdfDoc.embedPng(imageBytes);
+      } else {
+        embeddedImage = await this.pdfDoc.embedJpg(imageBytes);
+      }
+
+      page.drawImage(embeddedImage, {
+        x: annotation.x,
+        y: annotation.y,
+        width: annotation.width,
+        height: annotation.height,
+      });
+    } catch (error) {
+      console.error("Error adding image:", error);
+      throw error;
+    }
+  }
+
   async fillFormField(fieldName: string, value: string): Promise<void> {
     if (!this.pdfDoc) throw new Error("No PDF loaded");
 
     const form = this.pdfDoc.getForm();
     const fields = form.getFields();
 
-    const field = fields.find((f) => f.getName() === fieldName);
+    const field = fields.find((f: any) => f.getName() === fieldName);
     if (field) {
       try {
         const textField = form.getTextField(fieldName);
