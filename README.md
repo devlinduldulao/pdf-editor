@@ -75,7 +75,7 @@
 
 ## 🎬 Demo
 
-Visit the [Live Demo](#) to try the application. _(Note: Add your deployment URL here)_
+Visit the [Live Demo](https://pdf-editor-ten-alpha.vercel.app/) to try the application.
 
 ### Quick Start Example:
 
@@ -568,16 +568,26 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 Future enhancements planned:
 
-- [ ] Multi-page text annotations
-- [ ] Drawing tools (lines, shapes, highlights)
-- [ ] Signature pad for hand-drawn signatures
-- [ ] PDF merging and splitting
-- [ ] Page rotation and deletion
+- [ ] **Open Password-Protected PDFs** (Unlock and view secured files)
+- [ ] **Security & Protection**
+  - [ ] Redaction (Permanently remove sensitive content)
+  - [ ] Password Encryption (Secure files with AES-256)
+  - [ ] Permissions Management (Restrict printing, copying, editing)
+- [ ] **Advanced Page Manipulation**
+  - [ ] Convert PDF (to Word, Excel, PowerPoint)
+  - [ ] Compress/Optimize (Reduce file size)
+  - [ ] Flatten PDF (Merge annotations into base layer)
+- [ ] **Professional Editing**
+  - [ ] Edit Original Text (Modify existing base content)
+  - [ ] Form Creation (Add new fields, checkboxes, dropdowns)
+  - [ ] Bates Numbering (Legal document indexing)
+  - [ ] Watermarking (Add text/image watermarks)
+- [ ] **Workflow & Collaboration**
+  - [ ] eSign Workflows (Audit trails, request signatures)
+  - [ ] Compare Documents (Diff view for versions)
 - [ ] OCR text extraction
 - [ ] Cloud storage integration
-- [ ] Collaborative editing
 - [ ] Mobile app versions
-- [ ] Batch processing
 
 ---
 
