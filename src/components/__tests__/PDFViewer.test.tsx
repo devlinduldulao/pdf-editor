@@ -1,7 +1,6 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import PDFViewer from "../PDFViewer";
-import * as pdfjsLib from "pdfjs-dist";
 
 // Mock pdfjs-dist
 vi.mock("pdfjs-dist", () => ({
