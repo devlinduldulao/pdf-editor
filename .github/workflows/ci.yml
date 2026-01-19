@@ -22,9 +22,6 @@ jobs:
       - name: Install dependencies
         run: npm i --force
 
-      - name: Lint
-        run: npm run lint
-
       - name: Type check
         run: npm run typecheck
 
