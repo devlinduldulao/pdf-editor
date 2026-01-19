@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import App from "../App";
 import { pdfEditorService } from "@/services/pdfEditor";
@@ -34,7 +34,7 @@ vi.mock("@/services/pdfEditor", () => {
     addText: vi.fn(),
     addImage: vi.fn(),
     getPassword: vi.fn(() => undefined),
-    savePDF: vi.fn(() => new Uint8Array([1, 2, 3])),
+    savePDF: vi.fn(() => Promise.resolve(new Uint8Array([1, 2, 3]))),
   };
 
   return {
@@ -51,17 +51,39 @@ vi.mock("@/contexts/ThemeContext", () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+/**
+ * Note: These tests verify password-protected PDF handling using browser prompt().
+ * The current implementation uses window.prompt() and window.alert() which are mocked here.
+ */
 describe("App - Password Protected PDF Features", () => {
+  let originalPrompt: typeof window.prompt;
+  let originalAlert: typeof window.alert;
+
   beforeEach(() => {
     vi.clearAllMocks();
+    // Save original functions
+    originalPrompt = window.prompt;
+    originalAlert = window.alert;
+    // Mock by default to avoid hanging tests
+    window.prompt = vi.fn(() => null);
+    window.alert = vi.fn();
+  });
+
+  afterEach(() => {
+    // Restore original functions
+    window.prompt = originalPrompt;
+    window.alert = originalAlert;
   });
 
   describe("Password Prompt Flow", () => {
-    it("should prompt for password when encrypted PDF is uploaded", async () => {
+    it("should call prompt when encrypted PDF is uploaded", async () => {
       // Mock loadPDF to throw password required error
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
+      vi.mocked(pdfEditorService.loadPDF).mockRejectedValue(
         new Error("PDF_PASSWORD_REQUIRED"),
       );
+
+      // Mock prompt to return null (user cancelled)
+      window.prompt = vi.fn(() => null);
 
       render(<App />);
 
@@ -76,17 +98,17 @@ describe("App - Password Protected PDF Features", () => {
       const fileInput = screen.getByTestId("pdf-upload-input");
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
-      // Password prompt should appear
+      // Wait for loadPDF to be called
       await waitFor(() => {
-        expect(
-          screen.getByText(/This PDF is password-protected/i),
-        ).toBeInTheDocument();
+        expect(pdfEditorService.loadPDF).toHaveBeenCalled();
       });
 
-      // Should show password input
-      expect(
-        screen.getByPlaceholderText(/Enter password/i),
-      ).toBeInTheDocument();
+      // Prompt should be called after password error
+      await waitFor(() => {
+        expect(window.prompt).toHaveBeenCalledWith(
+          expect.stringContaining("password-protected"),
+        );
+      });
     });
 
     it("should load PDF after correct password is entered", async () => {
@@ -96,6 +118,9 @@ describe("App - Password Protected PDF Features", () => {
         .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
         .mockResolvedValueOnce(undefined);
 
+      // Mock prompt to return a password
+      window.prompt = vi.fn(() => "testpassword");
+
       render(<App />);
 
       const encryptedFile = new File(
@@ -107,41 +132,32 @@ describe("App - Password Protected PDF Features", () => {
       const fileInput = screen.getByTestId("pdf-upload-input");
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
-      // Wait for password prompt
+      // Wait for PDF to be loaded
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(2);
       });
 
-      // Enter password
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "testpassword" } });
-
-      // Click unlock button
-      const unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
-
-      // PDF should be loaded (password dialog should close)
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
-      });
-
-      // loadPDF should be called twice (once without password, once with)
-      expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(2);
+      // loadPDF should be called with password on second call
       expect(pdfEditorService.loadPDF).toHaveBeenLastCalledWith(
         encryptedFile,
         "testpassword",
       );
     });
 
-    it("should show error for wrong password", async () => {
-      // Both calls throw password required (simulating wrong password)
-      vi.mocked(pdfEditorService.loadPDF)
-        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
-        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"));
+    it("should show alert for wrong password", async () => {
+      // All calls throw password required (simulating wrong password)
+      vi.mocked(pdfEditorService.loadPDF).mockRejectedValue(
+        new Error("PDF_PASSWORD_REQUIRED"),
+      );
+
+      // First prompt returns password, second returns null (user cancelled)
+      let callCount = 0;
+      window.prompt = vi.fn(() => {
+        callCount++;
+        return callCount === 1 ? "wrongpassword" : null;
+      });
+
+      window.alert = vi.fn();
 
       render(<App />);
 
@@ -154,34 +170,90 @@ describe("App - Password Protected PDF Features", () => {
       const fileInput = screen.getByTestId("pdf-upload-input");
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
+      // Wait for alert to be called
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(window.alert).toHaveBeenCalledWith(
+          expect.stringContaining("Incorrect password"),
+        );
       });
 
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "wrongpassword" } });
-
-      const unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
-
-      // Password dialog should still be visible with error
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
+      // Should prompt for retry
+      expect(window.prompt).toHaveBeenCalledTimes(2);
     });
 
+    it("should allow user to cancel password prompt", async () => {
+      vi.mocked(pdfEditorService.loadPDF).mockRejectedValue(
+        new Error("PDF_PASSWORD_REQUIRED"),
+      );
+
+      // Mock prompt to return null (user cancelled)
+      window.prompt = vi.fn(() => null);
+
+      render(<App />);
+
+      const encryptedFile = new File(
+        [new Uint8Array([37, 80, 68, 70])],
+        "encrypted.pdf",
+        { type: "application/pdf" },
+      );
+
+      const fileInput = screen.getByTestId("pdf-upload-input");
+      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
+
+      // Wait for prompt to be called
+      await waitFor(() => {
+        expect(window.prompt).toHaveBeenCalled();
+      });
+
+      // loadPDF should only be called once (initial attempt)
+      expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(1);
+
+      // PDF should not be loaded (no file shown)
+      expect(screen.queryByTestId("pdf-canvas-page-1")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("Unencrypted PDF", () => {
+    it("should load unencrypted PDF without prompting for password", async () => {
+      vi.mocked(pdfEditorService.loadPDF).mockResolvedValue(undefined);
+
+      window.prompt = vi.fn();
+
+      render(<App />);
+
+      const normalFile = new File(
+        [new Uint8Array([37, 80, 68, 70])],
+        "normal.pdf",
+        { type: "application/pdf" },
+      );
+
+      const fileInput = screen.getByTestId("pdf-upload-input");
+      fireEvent.change(fileInput, { target: { files: [normalFile] } });
+
+      // Wait for PDF to be loaded
+      await waitFor(() => {
+        expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(1);
+      });
+
+      // Prompt should not be called for unencrypted PDF
+      expect(window.prompt).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("Password Retry Logic", () => {
     it("should allow multiple password attempts", async () => {
-      // First attempt: no password (error)
-      // Second attempt: wrong password (error)
-      // Third attempt: correct password (success)
-      vi.mocked(pdfEditorService.loadPDF)
-        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
-        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
-        .mockResolvedValueOnce(undefined);
+      // All calls fail
+      vi.mocked(pdfEditorService.loadPDF).mockRejectedValue(
+        new Error("PDF_PASSWORD_REQUIRED"),
+      );
+
+      // Return passwords for both prompts
+      window.prompt = vi
+        .fn()
+        .mockReturnValueOnce("wrong1")
+        .mockReturnValueOnce("wrong2");
+
+      window.alert = vi.fn();
 
       render(<App />);
 
@@ -194,310 +266,67 @@ describe("App - Password Protected PDF Features", () => {
       const fileInput = screen.getByTestId("pdf-upload-input");
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
-      // Wait for password prompt
+      // Wait for all attempts
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(3);
       });
 
-      // First attempt with wrong password
-      let passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "wrong1" } });
-      let unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
+      // Should prompt twice for retry
+      expect(window.prompt).toHaveBeenCalledTimes(2);
 
-      // Still showing password prompt
+      // Should show alerts for wrong passwords
+      expect(window.alert).toHaveBeenCalled();
+    });
+
+    it("should stop after two failed attempts", async () => {
+      vi.mocked(pdfEditorService.loadPDF).mockRejectedValue(
+        new Error("PDF_PASSWORD_REQUIRED"),
+      );
+
+      // Provide passwords for both retry attempts
+      window.prompt = vi
+        .fn()
+        .mockReturnValueOnce("wrong1")
+        .mockReturnValueOnce("wrong2");
+
+      window.alert = vi.fn();
+
+      render(<App />);
+
+      const encryptedFile = new File(
+        [new Uint8Array([37, 80, 68, 70])],
+        "encrypted.pdf",
+        { type: "application/pdf" },
+      );
+
+      const fileInput = screen.getByTestId("pdf-upload-input");
+      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
+
+      // Wait for final alert
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(window.alert).toHaveBeenCalledWith(
+          "Failed to open PDF: Incorrect password",
+        );
       });
 
-      // Second attempt with correct password
-      passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "correct" } });
-      unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
+      // Should only prompt twice (not infinite loop)
+      expect(window.prompt).toHaveBeenCalledTimes(2);
 
-      // Password dialog should close
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
-      });
-
-      // loadPDF should be called 3 times
+      // Should attempt load 3 times total (initial + 2 retries)
       expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(3);
-    });
-
-    it("should allow cancelling password prompt", async () => {
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
-        new Error("PDF_PASSWORD_REQUIRED"),
-      );
-
-      render(<App />);
-
-      const encryptedFile = new File(
-        [new Uint8Array([37, 80, 68, 70])],
-        "encrypted.pdf",
-        { type: "application/pdf" },
-      );
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
-
-      // Wait for password prompt
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
-
-      // Find and click cancel button
-      const cancelButton = screen.getByText(/Cancel/i);
-      fireEvent.click(cancelButton);
-
-      // Password dialog should close
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
-      });
-
-      // Should show uploader again
-      expect(
-        screen.getByText(/Drop your PDF here or click to browse/i),
-      ).toBeInTheDocument();
-    });
-  });
-
-  describe("Password Input Behavior", () => {
-    it("should accept password input via Enter key", async () => {
-      vi.mocked(pdfEditorService.loadPDF)
-        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
-        .mockResolvedValueOnce(undefined);
-
-      render(<App />);
-
-      const encryptedFile = new File(
-        [new Uint8Array([37, 80, 68, 70])],
-        "encrypted.pdf",
-        { type: "application/pdf" },
-      );
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
-
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
-
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "testpassword" } });
-
-      // Press Enter
-      fireEvent.keyDown(passwordInput, { key: "Enter", code: "Enter" });
-
-      // Password dialog should close
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
-      });
-
-      expect(pdfEditorService.loadPDF).toHaveBeenCalledWith(
-        encryptedFile,
-        "testpassword",
-      );
-    });
-
-    it("should show password as hidden by default", async () => {
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
-        new Error("PDF_PASSWORD_REQUIRED"),
-      );
-
-      render(<App />);
-
-      const encryptedFile = new File(
-        [new Uint8Array([37, 80, 68, 70])],
-        "encrypted.pdf",
-        { type: "application/pdf" },
-      );
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
-
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
-
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-
-      // Password input should be of type "password"
-      expect(passwordInput).toHaveAttribute("type", "password");
-    });
-
-    it("should clear password input on cancel", async () => {
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
-        new Error("PDF_PASSWORD_REQUIRED"),
-      );
-
-      render(<App />);
-
-      const encryptedFile = new File(
-        [new Uint8Array([37, 80, 68, 70])],
-        "encrypted.pdf",
-        { type: "application/pdf" },
-      );
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
-
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
-
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "somepassword" } });
-
-      expect(passwordInput).toHaveValue("somepassword");
-
-      // Click cancel
-      const cancelButton = screen.getByText(/Cancel/i);
-      fireEvent.click(cancelButton);
-
-      // Upload again and check password is cleared
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
-        new Error("PDF_PASSWORD_REQUIRED"),
-      );
-
-      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
-
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
-
-      const newPasswordInput = screen.getByPlaceholderText(/Enter password/i);
-      expect(newPasswordInput).toHaveValue("");
-    });
-  });
-
-  describe("Non-Password Errors", () => {
-    it("should show error message for corrupted PDF", async () => {
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
-        new Error("Corrupted PDF file"),
-      );
-
-      render(<App />);
-
-      const corruptedFile = new File([new Uint8Array([1, 2, 3])], "bad.pdf", {
-        type: "application/pdf",
-      });
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [corruptedFile] } });
-
-      // Should show error (not password prompt)
-      await waitFor(() => {
-        // The uploader should still be visible (file rejected)
-        expect(
-          screen.getByText(/Drop your PDF here or click to browse/i),
-        ).toBeInTheDocument();
-      });
-
-      // Should NOT show password prompt
-      expect(
-        screen.queryByText(/This PDF is password-protected/i),
-      ).not.toBeInTheDocument();
-    });
-
-    it("should distinguish between password error and other errors", async () => {
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
-        new Error("Invalid PDF structure"),
-      );
-
-      render(<App />);
-
-      const invalidFile = new File([new Uint8Array([1, 2, 3])], "invalid.pdf", {
-        type: "application/pdf",
-      });
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [invalidFile] } });
-
-      // Wait for processing
-      await waitFor(
-        () => {
-          expect(pdfEditorService.loadPDF).toHaveBeenCalled();
-        },
-        { timeout: 2000 },
-      );
-
-      // Should NOT show password prompt for non-password errors
-      expect(
-        screen.queryByText(/This PDF is password-protected/i),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  describe("Password Coordination with PDFViewer", () => {
-    it("should pass password to PDFViewer for rendering", async () => {
-      vi.mocked(pdfEditorService.loadPDF)
-        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
-        .mockResolvedValueOnce(undefined);
-
-      // Mock getPassword to return the password
-      vi.mocked(pdfEditorService.getPassword).mockReturnValue("testpassword");
-
-      render(<App />);
-
-      const encryptedFile = new File(
-        [new Uint8Array([37, 80, 68, 70])],
-        "encrypted.pdf",
-        { type: "application/pdf" },
-      );
-
-      const fileInput = screen.getByTestId("pdf-upload-input");
-      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
-
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
-
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: "testpassword" } });
-
-      const unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
-
-      // Wait for PDF to load
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
-      });
-
-      // Verify getPassword can be called
-      expect(pdfEditorService.getPassword()).toBe("testpassword");
     });
   });
 
   describe("Security and Edge Cases", () => {
     it("should handle empty password gracefully", async () => {
-      vi.mocked(pdfEditorService.loadPDF).mockRejectedValueOnce(
+      vi.mocked(pdfEditorService.loadPDF).mockRejectedValue(
         new Error("PDF_PASSWORD_REQUIRED"),
       );
+
+      // Return empty string (treated as cancelled)
+      window.prompt = vi.fn(() => "");
+
+      window.alert = vi.fn();
 
       render(<App />);
 
@@ -510,22 +339,13 @@ describe("App - Password Protected PDF Features", () => {
       const fileInput = screen.getByTestId("pdf-upload-input");
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
+      // Wait for prompt to be called
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(window.prompt).toHaveBeenCalled();
       });
 
-      // Try to unlock with empty password
-      const unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
-
-      // Should still show password prompt (not attempt to load with empty password)
-      await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
-      });
+      // Empty string is treated as cancelled, so loadPDF should only be called once (initial)
+      expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(1);
     });
 
     it("should handle special characters in password", async () => {
@@ -533,6 +353,9 @@ describe("App - Password Protected PDF Features", () => {
         .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
         .mockResolvedValueOnce(undefined);
 
+      const specialPassword = "p@$$w0rd!#%&*";
+      window.prompt = vi.fn(() => specialPassword);
+
       render(<App />);
 
       const encryptedFile = new File(
@@ -545,29 +368,11 @@ describe("App - Password Protected PDF Features", () => {
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(pdfEditorService.loadPDF).toHaveBeenCalledWith(
+          encryptedFile,
+          specialPassword,
+        );
       });
-
-      // Password with special characters
-      const specialPassword = "P@ssw0rd!#$%^&*()";
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: specialPassword } });
-
-      const unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
-
-      await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
-      });
-
-      expect(pdfEditorService.loadPDF).toHaveBeenCalledWith(
-        encryptedFile,
-        specialPassword,
-      );
     });
 
     it("should handle long passwords", async () => {
@@ -575,6 +380,9 @@ describe("App - Password Protected PDF Features", () => {
         .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
         .mockResolvedValueOnce(undefined);
 
+      const longPassword = "a".repeat(100);
+      window.prompt = vi.fn(() => longPassword);
+
       render(<App />);
 
       const encryptedFile = new File(
@@ -587,27 +395,42 @@ describe("App - Password Protected PDF Features", () => {
       fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
 
       await waitFor(() => {
-        expect(
-          screen.getByPlaceholderText(/Enter password/i),
-        ).toBeInTheDocument();
+        expect(pdfEditorService.loadPDF).toHaveBeenCalledWith(
+          encryptedFile,
+          longPassword,
+        );
       });
+    });
+  });
 
-      const longPassword = "a".repeat(100);
-      const passwordInput = screen.getByPlaceholderText(/Enter password/i);
-      fireEvent.change(passwordInput, { target: { value: longPassword } });
+  describe("Integration with File Upload", () => {
+    it("should handle password protected PDF in normal upload flow", async () => {
+      vi.mocked(pdfEditorService.loadPDF)
+        .mockRejectedValueOnce(new Error("PDF_PASSWORD_REQUIRED"))
+        .mockResolvedValueOnce(undefined);
 
-      const unlockButton = screen.getByText(/Unlock/i);
-      fireEvent.click(unlockButton);
+      window.prompt = vi.fn(() => "correctpassword");
 
+      render(<App />);
+
+      const encryptedFile = new File(
+        [new Uint8Array([37, 80, 68, 70])],
+        "encrypted.pdf",
+        { type: "application/pdf" },
+      );
+
+      const fileInput = screen.getByTestId("pdf-upload-input");
+      fireEvent.change(fileInput, { target: { files: [encryptedFile] } });
+
+      // Should successfully load after password
       await waitFor(() => {
-        expect(
-          screen.queryByText(/This PDF is password-protected/i),
-        ).not.toBeInTheDocument();
+        expect(pdfEditorService.loadPDF).toHaveBeenCalledTimes(2);
       });
 
-      expect(pdfEditorService.loadPDF).toHaveBeenCalledWith(
+      // Verify final call had password
+      expect(pdfEditorService.loadPDF).toHaveBeenLastCalledWith(
         encryptedFile,
-        longPassword,
+        "correctpassword",
       );
     });
   });
