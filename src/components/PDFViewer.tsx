@@ -56,6 +56,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     [],
   );
   const [isAddingText, setIsAddingText] = useState<boolean>(false);
+  const [draggingTextId, setDraggingTextId] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fontSize = 12;
 
@@ -259,7 +260,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     }
   };
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleOverlayDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isAddingText || !canvasRef.current?.firstChild) return;
 
     const canvas = canvasRef.current.firstChild as HTMLCanvasElement;
@@ -443,6 +444,49 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     const displayX = annotation.x * scale;
     const displayY = canvas.height - annotation.y * scale;
 
+    const handleTextMouseDown = (e: React.MouseEvent) => {
+      // Only allow dragging in Select mode (not Add Text mode)
+      if (isAddingText) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setDraggingTextId(annotation.id);
+
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const startPos = { x: annotation.x, y: annotation.y };
+
+      const handleMouseMove = (moveEvent: MouseEvent) => {
+        const dx = (moveEvent.clientX - startX) / scale;
+        const dy = (moveEvent.clientY - startY) / scale;
+
+        setTextAnnotations((prev) =>
+          prev.map((ann) =>
+            ann.id === annotation.id
+              ? { ...ann, x: startPos.x + dx, y: startPos.y - dy }
+              : ann,
+          ),
+        );
+      };
+
+      const handleMouseUp = () => {
+        setDraggingTextId(null);
+        document.removeEventListener("mousemove", handleMouseMove);
+        document.removeEventListener("mouseup", handleMouseUp);
+      };
+
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+    };
+
+    const isDraggable = !isAddingText;
+    const cursorStyle = isDraggable
+      ? draggingTextId === annotation.id
+        ? "grabbing"
+        : "grab"
+      : "default";
+
     return (
       <div
         key={annotation.id}
@@ -464,7 +508,35 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           className="border-0 bg-transparent hover:bg-indigo-50/30 focus:bg-white/80 focus:ring-2 focus:ring-indigo-500/20 rounded shadow-none focus:shadow-sm transition-all p-1"
           placeholder="Type here..."
           autoFocus
+          readOnly={isDraggable}
         />
+        {/* Draggable overlay in Select mode */}
+        {isDraggable && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              cursor: cursorStyle,
+              zIndex: 1,
+            }}
+            onMouseDown={handleTextMouseDown}
+            title="Click and drag to move, or double-click to edit"
+            onDoubleClick={(e) => {
+              e.stopPropagation();
+              setIsAddingText(false);
+              // Focus the input
+              const input = e.currentTarget.previousSibling as HTMLInputElement;
+              if (input) {
+                input.readOnly = false;
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+              }
+            }}
+          />
+        )}
       </div>
     );
   };
@@ -693,7 +765,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             ref={overlayRef}
             data-testid="pdf-overlay"
             className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""}`}
-            onClick={handleOverlayClick}
+            onDoubleClick={handleOverlayDoubleClick}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
           >
@@ -716,7 +788,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           <div className="bg-indigo-500 p-1 rounded-full">
             <Type className="w-3 h-3 text-white" />
           </div>
-          <span>Click anywhere to add text</span>
+          <span>Double-click anywhere to add text</span>
           <div className="h-4 w-px bg-white/20 ml-1"></div>
           <Button
             variant="link"
