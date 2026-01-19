@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import path from "path";
@@ -6,8 +6,13 @@ import tailwindcss from "@tailwindcss/vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [
+export default defineConfig(({mode}) =>{
+  return {
+    define: {
+      // Make environment mode available to the app
+      "import.meta.env.MODE": JSON.stringify(mode),
+    },
+    plugins: [
     react({
       babel: {
         plugins: ["babel-plugin-react-compiler"],
@@ -56,4 +61,6 @@ export default defineConfig({
     css: true,
     globals: true,
   },
+  }
+  
 });

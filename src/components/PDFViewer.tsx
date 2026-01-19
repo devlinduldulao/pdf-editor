@@ -670,6 +670,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           ></div>
           <div
             ref={overlayRef}
+            data-testid="pdf-overlay"
             className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""}`}
             onClick={handleOverlayClick}
             onDragOver={handleDragOver}
