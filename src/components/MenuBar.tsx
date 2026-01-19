@@ -1,6 +1,13 @@
 import React, { memo } from "react";
 import { Button } from "@/components/ui/button";
-import { FilePlus, Save, LayoutTemplate, Share } from "lucide-react";
+import {
+  FilePlus,
+  Save,
+  LayoutTemplate,
+  Share,
+  Github,
+  Bug,
+} from "lucide-react";
 
 interface MenuBarProps {
   onSave: () => void;
@@ -45,6 +52,35 @@ const MenuBar: React.FC<MenuBarProps> = memo(
           >
             <Share className="w-4 h-4" />
             Export
+          </Button>
+
+          <div className="w-px h-6 bg-slate-700 mx-2" />
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              window.open(
+                "https://github.com/devlinduldulao/pdf-editor",
+                "_blank",
+              )
+            }
+            title="View on GitHub"
+          >
+            <Github className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() =>
+              window.open(
+                "https://github.com/devlinduldulao/pdf-editor/issues",
+                "_blank",
+              )
+            }
+            title="Report an issue"
+          >
+            <Bug className="w-4 h-4" />
           </Button>
         </div>
       </header>
