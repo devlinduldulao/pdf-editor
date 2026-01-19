@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,25 +15,28 @@ interface PDFEditorProps {
   onAnnotationAdd: (annotation: TextAnnotation) => void;
 }
 
-const PDFEditor: React.FC<PDFEditorProps> = ({ onAnnotationAdd }) => {
+const PDFEditor: React.FC<PDFEditorProps> = memo(({ onAnnotationAdd }) => {
   const [isAddingText, setIsAddingText] = useState(false);
   const [fontSize, setFontSize] = useState(12);
   const [textInput, setTextInput] = useState("");
   const [showTextInput, setShowTextInput] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isAddingText) return;
+  const handleCanvasClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!isAddingText) return;
 
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    setPosition({ x, y });
-    setShowTextInput(true);
-  };
+      setPosition({ x, y });
+      setShowTextInput(true);
+    },
+    [isAddingText],
+  );
 
-  const handleAddText = () => {
+  const handleAddText = useCallback(() => {
     if (textInput.trim()) {
       onAnnotationAdd({
         id: Date.now().toString(),
@@ -46,7 +49,7 @@ const PDFEditor: React.FC<PDFEditorProps> = ({ onAnnotationAdd }) => {
       setShowTextInput(false);
       setIsAddingText(false);
     }
-  };
+  }, [textInput, position, fontSize, onAnnotationAdd]);
 
   return (
     <div className="relative" onClick={handleCanvasClick}>
@@ -112,6 +115,8 @@ const PDFEditor: React.FC<PDFEditorProps> = ({ onAnnotationAdd }) => {
       )}
     </div>
   );
-};
+});
+
+PDFEditor.displayName = "PDFEditor";
 
 export default PDFEditor;

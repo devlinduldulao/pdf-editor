@@ -1,52 +1,57 @@
-import { useState } from 'react';
-import MenuBar from './components/MenuBar';
-import PDFUploader from './components/PDFUploader';
-import PDFViewer from './components/PDFViewer';
-import { pdfEditorService } from './services/pdfEditor';
+import { useState, useCallback } from "react";
+import MenuBar from "./components/MenuBar";
+import PDFUploader from "./components/PDFUploader";
+import PDFViewer from "./components/PDFViewer";
+import { pdfEditorService } from "./services/pdfEditor";
 
 function App() {
   const [currentFile, setCurrentFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState<string>('');
+  const [fileName, setFileName] = useState<string>("");
 
-  const handleFileSelect = async (file: File) => {
+  const handleFileSelect = useCallback(async (file: File) => {
     try {
       await pdfEditorService.loadPDF(file);
       setCurrentFile(file);
       setFileName(file.name);
     } catch (error) {
-      console.error('Error loading PDF:', error);
-      alert('Failed to load PDF file');
+      console.error("Error loading PDF:", error);
+      alert("Failed to load PDF file");
     }
-  };
+  }, []);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     try {
       await pdfEditorService.downloadPDF(fileName);
     } catch (error) {
-      console.error('Error saving PDF:', error);
-      alert('Failed to save PDF');
+      console.error("Error saving PDF:", error);
+      alert("Failed to save PDF");
     }
-  };
+  }, [fileName]);
 
-  const handleSaveAs = async () => {
-    const newFileName = prompt('Enter file name:', fileName.replace('.pdf', ''));
+  const handleSaveAs = useCallback(async () => {
+    const newFileName = prompt(
+      "Enter file name:",
+      fileName.replace(".pdf", ""),
+    );
     if (newFileName) {
       try {
         await pdfEditorService.downloadPDF(`${newFileName}.pdf`);
       } catch (error) {
-        console.error('Error saving PDF:', error);
-        alert('Failed to save PDF');
+        console.error("Error saving PDF:", error);
+        alert("Failed to save PDF");
       }
     }
-  };
+  }, [fileName]);
 
-  const handleNew = () => {
-    if (confirm('Start with a new document? Any unsaved changes will be lost.')) {
+  const handleNew = useCallback(() => {
+    if (
+      confirm("Start with a new document? Any unsaved changes will be lost.")
+    ) {
       setCurrentFile(null);
-      setFileName('');
+      setFileName("");
       pdfEditorService.reset();
     }
-  };
+  }, []);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-slate-100 font-sans text-slate-900">

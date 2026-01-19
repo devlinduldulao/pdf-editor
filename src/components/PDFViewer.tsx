@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback, memo } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -199,32 +199,28 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     renderPage();
   }, [pdfDocument, currentPage, scale]);
 
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  const handlePrevPage = useCallback(() => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  }, []);
 
-  const handleNextPage = () => {
-    if (currentPage < numPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((prev) => Math.min(prev + 1, numPages));
+  }, [numPages]);
 
-  const handleZoomIn = () => {
+  const handleZoomIn = useCallback(() => {
     setScale((prev) => Math.min(prev + 0.25, 3));
-  };
+  }, []);
 
-  const handleZoomOut = () => {
+  const handleZoomOut = useCallback(() => {
     setScale((prev) => Math.max(prev - 0.25, 0.5));
-  };
+  }, []);
 
-  const handleFieldChange = (fieldId: string, value: string) => {
+  const handleFieldChange = useCallback((fieldId: string, value: string) => {
     setFieldValues((prev) => ({
       ...prev,
       [fieldId]: value,
     }));
-  };
+  }, []);
 
   const handleApplyChanges = async () => {
     try {
@@ -337,46 +333,73 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     reader.readAsDataURL(file);
   };
 
-  const handleTextChange = (id: string, value: string) => {
+  const handleTextChange = useCallback((id: string, value: string) => {
     setTextAnnotations((prev) =>
       prev.map((ann) => (ann.id === id ? { ...ann, text: value } : ann)),
     );
-  };
+  }, []);
 
-  const handleDeleteAnnotation = (id: string) => {
+  const handleDeleteAnnotation = useCallback((id: string) => {
     setTextAnnotations((prev) => prev.filter((ann) => ann.id !== id));
-  };
+  }, []);
 
-  const getFieldPosition = (field: FormField) => {
-    if (!canvasRef.current?.firstChild) return null;
+  const getFieldPosition = useCallback(
+    (field: FormField) => {
+      if (!canvasRef.current?.firstChild) return null;
 
-    const canvas = canvasRef.current.firstChild as HTMLCanvasElement;
-    const [x1, y1, x2, y2] = field.rect;
+      const canvas = canvasRef.current.firstChild as HTMLCanvasElement;
+      const [x1, y1, x2, y2] = field.rect;
 
-    return {
-      left: x1 * scale,
-      top: canvas.height - y2 * scale,
-      width: (x2 - x1) * scale,
-      height: (y2 - y1) * scale,
-    };
-  };
+      return {
+        left: x1 * scale,
+        top: canvas.height - y2 * scale,
+        width: (x2 - x1) * scale,
+        height: (y2 - y1) * scale,
+      };
+    },
+    [scale],
+  );
 
-  const renderFormField = (field: FormField) => {
-    if (field.page !== currentPage) return null;
+  const FormFieldComponent = memo(
+    ({
+      field,
+      pos,
+      isCheckbox,
+    }: {
+      field: FormField;
+      pos: any;
+      isCheckbox: boolean;
+    }) => {
+      const commonStyle: React.CSSProperties = {
+        position: "absolute",
+        left: `${pos.left}px`,
+        top: `${pos.top}px`,
+        width: `${pos.width}px`,
+        height: `${pos.height}px`,
+      };
 
-    const pos = getFieldPosition(field);
-    if (!pos) return null;
+      if (isCheckbox) {
+        return (
+          <div
+            key={field.id}
+            style={commonStyle}
+            className="flex items-center justify-center bg-blue-50/90 hover:bg-blue-100/90 border-2 border-blue-500 rounded shadow-md cursor-pointer transition-colors"
+            title={field.name}
+          >
+            <Checkbox
+              checked={
+                fieldValues[field.id] === "Yes" ||
+                fieldValues[field.id] === "true"
+              }
+              onCheckedChange={(checked) =>
+                handleFieldChange(field.id, checked ? "Yes" : "No")
+              }
+              className="w-5 h-5"
+            />
+          </div>
+        );
+      }
 
-    const commonStyle: React.CSSProperties = {
-      position: "absolute",
-      left: `${pos.left}px`,
-      top: `${pos.top}px`,
-      width: `${pos.width}px`,
-      height: `${pos.height}px`,
-    };
-
-    if (field.type === "Tx") {
-      // Text field
       return (
         <Input
           key={field.id}
@@ -388,31 +411,29 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           title={field.name}
         />
       );
-    } else if (field.type === "Btn") {
-      // Checkbox/Button
-      return (
-        <div
-          key={field.id}
-          style={commonStyle}
-          className="flex items-center justify-center bg-blue-50/90 hover:bg-blue-100/90 border-2 border-blue-500 rounded shadow-md cursor-pointer transition-colors"
-          title={field.name}
-        >
-          <Checkbox
-            checked={
-              fieldValues[field.id] === "Yes" ||
-              fieldValues[field.id] === "true"
-            }
-            onCheckedChange={(checked) =>
-              handleFieldChange(field.id, checked ? "Yes" : "No")
-            }
-            className="w-5 h-5"
-          />
-        </div>
-      );
-    }
+    },
+  );
 
-    return null;
-  };
+  FormFieldComponent.displayName = "FormFieldComponent";
+
+  const renderFormField = useCallback(
+    (field: FormField) => {
+      if (field.page !== currentPage) return null;
+
+      const pos = getFieldPosition(field);
+      if (!pos) return null;
+
+      return (
+        <FormFieldComponent
+          key={field.id}
+          field={field}
+          pos={pos}
+          isCheckbox={field.type === "Btn"}
+        />
+      );
+    },
+    [currentPage, fieldValues, handleFieldChange, getFieldPosition],
+  );
 
   const renderTextAnnotation = (annotation: TextAnnotation) => {
     if (annotation.pageNumber !== currentPage || !canvasRef.current?.firstChild)
