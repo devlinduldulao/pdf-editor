@@ -24,11 +24,31 @@ export interface ImageAnnotation {
 export class PDFEditorService {
   private pdfDoc: PDFDocument | null = null;
   private originalBytes: Uint8Array | null = null;
+  private password: string | undefined = undefined;
 
-  async loadPDF(file: File): Promise<void> {
+  async loadPDF(file: File, password?: string): Promise<void> {
     const arrayBuffer = await file.arrayBuffer();
     this.originalBytes = new Uint8Array(arrayBuffer);
-    this.pdfDoc = await PDFDocument.load(this.originalBytes);
+    this.password = password;
+    
+    try {
+      // Try to load with password if provided, otherwise try without
+      const options = password ? { password, ignoreEncryption: false } : {};
+      this.pdfDoc = await PDFDocument.load(this.originalBytes, options);
+    } catch (error: any) {
+      // Check if it's an encryption/password error
+      const errorMsg = error.message?.toLowerCase() || '';
+      if (
+        errorMsg.includes('encrypted') ||
+        errorMsg.includes('password') ||
+        errorMsg.includes('decrypt') ||
+        errorMsg.includes('security')
+      ) {
+        throw new Error('PDF_PASSWORD_REQUIRED');
+      }
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   async addText(annotation: TextAnnotation): Promise<void> {

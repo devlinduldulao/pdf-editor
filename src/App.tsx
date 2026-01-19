@@ -9,10 +9,53 @@ function App() {
   const [fileName, setFileName] = useState<string>("");
 
   const handleFileSelect = useCallback(async (file: File) => {
+    const attemptLoad = async (password?: string): Promise<boolean> => {
+      try {
+        await pdfEditorService.loadPDF(file, password);
+        setCurrentFile(file);
+        setFileName(file.name);
+        return true;
+      } catch (error: any) {
+        console.error("Error loading PDF:", error);
+        // Check if it's a password-related error
+        const errorMsg = error.message?.toLowerCase() || "";
+        if (
+          errorMsg.includes("password") ||
+          errorMsg.includes("encrypted") ||
+          errorMsg.includes("decrypt") ||
+          errorMsg === "pdf_password_required"
+        ) {
+          return false;
+        }
+        throw error;
+      }
+    };
+
     try {
-      await pdfEditorService.loadPDF(file);
-      setCurrentFile(file);
-      setFileName(file.name);
+      // First attempt without password
+      const success = await attemptLoad();
+      if (!success) {
+        // PDF is password protected, prompt user
+        const password = prompt(
+          "This PDF is password-protected. Please enter the password:",
+        );
+        if (password) {
+          const retrySuccess = await attemptLoad(password);
+          if (!retrySuccess) {
+            alert("Incorrect password. Please try again.");
+            // Retry one more time
+            const retryPassword = prompt(
+              "Incorrect password. Please try again:",
+            );
+            if (retryPassword) {
+              const finalSuccess = await attemptLoad(retryPassword);
+              if (!finalSuccess) {
+                alert("Failed to open PDF: Incorrect password");
+              }
+            }
+          }
+        }
+      }
     } catch (error) {
       console.error("Error loading PDF:", error);
       alert("Failed to load PDF file");

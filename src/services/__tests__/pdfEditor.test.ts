@@ -7,6 +7,12 @@ vi.mock("pdf-lib", () => ({
     load: vi.fn(),
   },
   rgb: vi.fn(),
+  StandardFonts: {
+    Helvetica: "Helvetica",
+    HelveticaBold: "Helvetica-Bold",
+    HelveticaOblique: "Helvetica-Oblique",
+    HelveticaBoldOblique: "Helvetica-BoldOblique",
+  },
 }));
 
 describe("PDFEditorService", () => {
@@ -26,6 +32,7 @@ describe("PDFEditorService", () => {
       save: vi.fn().mockResolvedValue(new Uint8Array()),
       embedPng: vi.fn().mockResolvedValue({}),
       embedJpg: vi.fn().mockResolvedValue({}),
+      embedFont: vi.fn().mockResolvedValue({}),
     };
     (PDFDocument.load as any).mockResolvedValue(mockPdfDoc);
   });

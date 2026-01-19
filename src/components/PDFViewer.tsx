@@ -16,6 +16,8 @@ import {
   Trash2,
   Bold,
   Italic,
+  Plus,
+  Minus,
 } from "lucide-react";
 import type { ImageAnnotation } from "@/services/pdfEditor";
 
@@ -60,19 +62,50 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     [],
   );
   const [isAddingText, setIsAddingText] = useState<boolean>(false);
+  const [selectedAnnotationId, setSelectedAnnotationId] = useState<
+    string | null
+  >(null);
   const [draggingTextId, setDraggingTextId] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const [fontSize, setFontSize] = useState<number>(12);
-  const [isBold, setIsBold] = useState<boolean>(false);
-  const [isItalic, setIsItalic] = useState<boolean>(false);
+
+  // Defaults for new text
+  const defaultFontSize = 12;
 
   useEffect(() => {
     if (!file) return;
 
     const loadPDF = async () => {
-      try {
+      const attemptLoad = async (password?: string): Promise<any> => {
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const loadingTask = pdfjsLib.getDocument({
+          data: arrayBuffer,
+          password: password,
+        });
+
+        // Handle password requests
+        loadingTask.onPassword = (updatePassword: any, reason: number) => {
+          if (reason === 1) {
+            // Need password
+            const pwd = prompt("This PDF requires a password to view:");
+            if (pwd) {
+              updatePassword(pwd);
+            }
+          } else if (reason === 2) {
+            // Incorrect password
+            const pwd = prompt("Incorrect password. Please try again:");
+            if (pwd) {
+              updatePassword(pwd);
+            } else {
+              throw new Error("Password required");
+            }
+          }
+        };
+
+        return await loadingTask.promise;
+      };
+
+      try {
+        const pdf = await attemptLoad();
         setPdfDocument(pdf);
         setNumPages(pdf.numPages);
         setCurrentPage(1);
@@ -284,12 +317,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
       x: pdfX,
       y: pdfY,
       pageNumber: currentPage,
-      fontSize: fontSize,
-      isBold: isBold,
-      isItalic: isItalic,
+      fontSize: defaultFontSize,
+      isBold: false,
+      isItalic: false,
     };
 
     setTextAnnotations((prev) => [...prev, newAnnotation]);
+    setSelectedAnnotationId(newAnnotation.id);
+    setIsAddingText(false); // Switch to edit mode immediately
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -347,6 +382,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
       prev.map((ann) => (ann.id === id ? { ...ann, text: value } : ann)),
     );
   }, []);
+
+  const updateAnnotationStyle = useCallback(
+    (id: string, updates: Partial<TextAnnotation>) => {
+      setTextAnnotations((prev) =>
+        prev.map((ann) => (ann.id === id ? { ...ann, ...updates } : ann)),
+      );
+    },
+    [],
+  );
 
   const handleDeleteAnnotation = useCallback((id: string) => {
     setTextAnnotations((prev) => prev.filter((ann) => ann.id !== id));
@@ -489,6 +533,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     };
 
     const isDraggable = !isAddingText;
+    const isSelected = selectedAnnotationId === annotation.id;
+
     const cursorStyle = isDraggable
       ? draggingTextId === annotation.id
         ? "grabbing"
@@ -503,12 +549,88 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           left: `${displayX}px`,
           top: `${displayY}px`,
           minWidth: "150px",
+          zIndex: isSelected ? 30 : 20,
         }}
+        onMouseDown={() => setSelectedAnnotationId(annotation.id)}
         onContextMenu={(e) => {
           e.preventDefault();
           handleDeleteAnnotation(annotation.id);
         }}
       >
+        {isSelected && (
+          <div
+            className="absolute -top-12 left-0 flex items-center gap-1 bg-white rounded-lg shadow-xl border border-slate-200 p-1 animate-in fade-in zoom-in-95 duration-200"
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 ${annotation.isBold ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-100"}`}
+              onClick={() =>
+                updateAnnotationStyle(annotation.id, {
+                  isBold: !annotation.isBold,
+                })
+              }
+              title="Bold"
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={`h-8 w-8 ${annotation.isItalic ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-100"}`}
+              onClick={() =>
+                updateAnnotationStyle(annotation.id, {
+                  isItalic: !annotation.isItalic,
+                })
+              }
+              title="Italic"
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <div className="w-px h-4 bg-slate-200 mx-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-slate-600 hover:bg-slate-100"
+              onClick={() =>
+                updateAnnotationStyle(annotation.id, {
+                  fontSize: Math.max(8, (annotation.fontSize || 12) - 2),
+                })
+              }
+              title="Decrease font size"
+            >
+              <Minus className="w-3 h-3" />
+            </Button>
+            <span className="text-xs font-medium w-8 text-center tabular-nums text-slate-700">
+              {annotation.fontSize || 12}
+            </span>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-slate-600 hover:bg-slate-100"
+              onClick={() =>
+                updateAnnotationStyle(annotation.id, {
+                  fontSize: Math.min(72, (annotation.fontSize || 12) + 2),
+                })
+              }
+              title="Increase font size"
+            >
+              <Plus className="w-3 h-3" />
+            </Button>
+            <div className="w-px h-4 bg-slate-200 mx-1" />
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-red-500 hover:bg-red-50"
+              onClick={() => handleDeleteAnnotation(annotation.id)}
+              title="Delete"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+
         <Input
           value={annotation.text}
           onChange={(e: any) => handleTextChange(annotation.id, e.target.value)}
@@ -516,12 +638,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             fontSize: `${annotation.fontSize}px`,
             fontWeight: annotation.isBold ? "bold" : "normal",
             fontStyle: annotation.isItalic ? "italic" : "normal",
+            border: isSelected ? "1px dashed #6366f1" : "1px solid transparent",
+            background: isSelected ? "rgba(255, 255, 255, 0.9)" : "transparent",
+            minWidth: "150px",
+            width: `${Math.max(150, annotation.text.length * (annotation.fontSize || 12) * 0.6)}px`,
           }}
-          className="border-0 bg-transparent hover:bg-indigo-50/30 focus:bg-white/80 focus:ring-2 focus:ring-indigo-500/20 rounded shadow-none focus:shadow-sm transition-all p-1"
+          className="rounded shadow-none focus:shadow-sm transition-all p-1 h-auto"
           placeholder="Type here..."
-          autoFocus
-          readOnly={isDraggable}
+          autoFocus={isSelected}
+          readOnly={isDraggable && !isSelected}
         />
+
         {/* Draggable overlay in Select mode */}
         {isDraggable && (
           <div
@@ -702,42 +829,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               accept="image/*"
               onChange={handleImageUpload}
             />
-
-            <div className="h-6 w-px bg-slate-200 mx-1" />
-
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsBold((p) => !p)}
-                className={`h-7 w-7 ${isBold ? "bg-white shadow-sm text-indigo-600" : "text-slate-500 hover:text-slate-900"}`}
-                title="Bold"
-              >
-                <Bold className="w-4 h-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsItalic((p) => !p)}
-                className={`h-7 w-7 ${isItalic ? "bg-white shadow-sm text-indigo-600" : "text-slate-500 hover:text-slate-900"}`}
-                title="Italic"
-              >
-                <Italic className="w-4 h-4" />
-              </Button>
-              <div className="flex items-center gap-1 bg-white rounded border border-slate-200 px-1 ml-1 h-7">
-                <Input
-                  type="number"
-                  value={fontSize}
-                  onChange={(e) => setFontSize(Number(e.target.value))}
-                  className="h-6 w-12 text-xs text-center p-0 border-0 bg-transparent focus-visible:ring-0 appearance-none"
-                  min={8}
-                  max={72}
-                />
-                <span className="text-[10px] text-slate-400 select-none mr-1">
-                  px
-                </span>
-              </div>
-            </div>
           </div>
 
           <div className="h-6 w-px bg-slate-200" />
@@ -816,6 +907,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             onDoubleClick={handleOverlayDoubleClick}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
+            onClick={() => setSelectedAnnotationId(null)}
           >
             <div className="relative w-full h-full">
               {formFields.map((field) => renderFormField(field))}

@@ -8,6 +8,7 @@ import {
   Github,
   Bug,
 } from "lucide-react";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 interface MenuBarProps {
   onSave: () => void;
@@ -19,11 +20,11 @@ interface MenuBarProps {
 const MenuBar: React.FC<MenuBarProps> = memo(
   ({ onSave, onSaveAs, onNew, hasDocument }) => {
     return (
-      <header className="flex justify-between items-center px-6 py-3 bg-slate-900 text-white border-b border-slate-800 h-16 shrink-0 z-50">
+      <header className="flex justify-between items-center px-6 py-3 bg-card text-card-foreground border-b border-border h-16 shrink-0 z-50">
         <div className="flex items-center gap-2">
-          <LayoutTemplate className="w-5 h-5 text-indigo-400" />
+          <LayoutTemplate className="w-5 h-5 text-primary" />
           <h1 className="text-lg font-semibold tracking-wide">
-            PDF<span className="text-indigo-400">Editor</span>
+            PDF<span className="text-primary">Editor</span>
           </h1>
         </div>
 
@@ -33,7 +34,7 @@ const MenuBar: React.FC<MenuBarProps> = memo(
             New
           </Button>
 
-          <div className="w-px h-6 bg-slate-700 mx-2" />
+          <div className="w-px h-6 bg-border mx-2" />
 
           <Button
             variant="ghost"
@@ -54,7 +55,11 @@ const MenuBar: React.FC<MenuBarProps> = memo(
             Export
           </Button>
 
-          <div className="w-px h-6 bg-slate-700 mx-2" />
+          <div className="w-px h-6 bg-border mx-2" />
+
+          <ThemeSwitcher />
+
+          <div className="w-px h-6 bg-border mx-2" />
 
           <Button
             variant="ghost"
