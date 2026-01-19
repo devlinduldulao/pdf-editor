@@ -570,16 +570,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           <div
             className="absolute -top-12 left-0 flex items-center gap-1 bg-white rounded-lg shadow-xl border border-slate-200 p-1 animate-in fade-in zoom-in-95 duration-200"
             onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => e.stopPropagation()}
           >
             <Button
               variant="ghost"
               size="icon"
               className={`h-8 w-8 ${annotation.isBold ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-100"}`}
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 updateAnnotationStyle(annotation.id, {
                   isBold: !annotation.isBold,
-                })
-              }
+                });
+              }}
               title="Bold"
             >
               <Bold className="w-4 h-4" />
@@ -588,11 +590,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               variant="ghost"
               size="icon"
               className={`h-8 w-8 ${annotation.isItalic ? "bg-indigo-50 text-indigo-600" : "text-slate-600 hover:bg-slate-100"}`}
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 updateAnnotationStyle(annotation.id, {
                   isItalic: !annotation.isItalic,
-                })
-              }
+                });
+              }}
               title="Italic"
             >
               <Italic className="w-4 h-4" />
@@ -602,11 +605,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-slate-600 hover:bg-slate-100"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 updateAnnotationStyle(annotation.id, {
                   fontSize: Math.max(8, (annotation.fontSize || 12) - 2),
-                })
-              }
+                });
+              }}
               title="Decrease font size"
             >
               <Minus className="w-3 h-3" />
@@ -618,11 +622,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-slate-600 hover:bg-slate-100"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation();
                 updateAnnotationStyle(annotation.id, {
                   fontSize: Math.min(72, (annotation.fontSize || 12) + 2),
-                })
-              }
+                });
+              }}
               title="Increase font size"
             >
               <Plus className="w-3 h-3" />
@@ -632,7 +637,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-red-500 hover:bg-red-50"
-              onClick={() => handleDeleteAnnotation(annotation.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteAnnotation(annotation.id);
+              }}
               title="Delete"
             >
               <Trash2 className="w-4 h-4" />
