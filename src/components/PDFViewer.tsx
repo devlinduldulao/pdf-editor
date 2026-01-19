@@ -14,6 +14,8 @@ import {
   Check,
   Image as ImageIcon,
   Trash2,
+  Bold,
+  Italic,
 } from "lucide-react";
 import type { ImageAnnotation } from "@/services/pdfEditor";
 
@@ -40,6 +42,8 @@ interface TextAnnotation {
   y: number;
   pageNumber: number;
   fontSize: number;
+  isBold?: boolean;
+  isItalic?: boolean;
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
@@ -58,7 +62,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
   const [isAddingText, setIsAddingText] = useState<boolean>(false);
   const [draggingTextId, setDraggingTextId] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
-  const fontSize = 12;
+  const [fontSize, setFontSize] = useState<number>(12);
+  const [isBold, setIsBold] = useState<boolean>(false);
+  const [isItalic, setIsItalic] = useState<boolean>(false);
 
   useEffect(() => {
     if (!file) return;
@@ -279,6 +285,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
       y: pdfY,
       pageNumber: currentPage,
       fontSize: fontSize,
+      isBold: isBold,
+      isItalic: isItalic,
     };
 
     setTextAnnotations((prev) => [...prev, newAnnotation]);
@@ -504,7 +512,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         <Input
           value={annotation.text}
           onChange={(e: any) => handleTextChange(annotation.id, e.target.value)}
-          style={{ fontSize: `${annotation.fontSize}px` }}
+          style={{
+            fontSize: `${annotation.fontSize}px`,
+            fontWeight: annotation.isBold ? "bold" : "normal",
+            fontStyle: annotation.isItalic ? "italic" : "normal",
+          }}
           className="border-0 bg-transparent hover:bg-indigo-50/30 focus:bg-white/80 focus:ring-2 focus:ring-indigo-500/20 rounded shadow-none focus:shadow-sm transition-all p-1"
           placeholder="Type here..."
           autoFocus
@@ -690,6 +702,42 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               accept="image/*"
               onChange={handleImageUpload}
             />
+
+            <div className="h-6 w-px bg-slate-200 mx-1" />
+
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsBold((p) => !p)}
+                className={`h-7 w-7 ${isBold ? "bg-white shadow-sm text-indigo-600" : "text-slate-500 hover:text-slate-900"}`}
+                title="Bold"
+              >
+                <Bold className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsItalic((p) => !p)}
+                className={`h-7 w-7 ${isItalic ? "bg-white shadow-sm text-indigo-600" : "text-slate-500 hover:text-slate-900"}`}
+                title="Italic"
+              >
+                <Italic className="w-4 h-4" />
+              </Button>
+              <div className="flex items-center gap-1 bg-white rounded border border-slate-200 px-1 ml-1 h-7">
+                <Input
+                  type="number"
+                  value={fontSize}
+                  onChange={(e) => setFontSize(Number(e.target.value))}
+                  className="h-6 w-12 text-xs text-center p-0 border-0 bg-transparent focus-visible:ring-0 appearance-none"
+                  min={8}
+                  max={72}
+                />
+                <span className="text-[10px] text-slate-400 select-none mr-1">
+                  px
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="h-6 w-px bg-slate-200" />

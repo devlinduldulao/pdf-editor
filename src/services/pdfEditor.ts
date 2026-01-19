@@ -1,4 +1,4 @@
-import { PDFDocument, rgb } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export interface TextAnnotation {
   id: string;
@@ -7,6 +7,8 @@ export interface TextAnnotation {
   y: number;
   pageNumber: number;
   fontSize?: number;
+  isBold?: boolean;
+  isItalic?: boolean;
 }
 
 export interface ImageAnnotation {
@@ -43,10 +45,22 @@ export class PDFEditorService {
 
     console.log("Adding text:", annotation);
 
+    let fontToEmbed = StandardFonts.Helvetica;
+    if (annotation.isBold && annotation.isItalic) {
+      fontToEmbed = StandardFonts.HelveticaBoldOblique;
+    } else if (annotation.isBold) {
+      fontToEmbed = StandardFonts.HelveticaBold;
+    } else if (annotation.isItalic) {
+      fontToEmbed = StandardFonts.HelveticaOblique;
+    }
+
+    const font = await this.pdfDoc.embedFont(fontToEmbed);
+
     page.drawText(annotation.text, {
       x: annotation.x,
       y: annotation.y,
       size: annotation.fontSize || 12,
+      font,
       color: rgb(0, 0, 0),
     });
   }
