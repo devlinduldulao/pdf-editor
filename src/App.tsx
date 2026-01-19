@@ -95,6 +95,54 @@ function App() {
     }
   }, [fileName]);
 
+  const handlePrint = useCallback(async () => {
+    try {
+      const pdfBytes = await pdfEditorService.savePDF();
+      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      // Create hidden iframe for printing
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+
+      // Set up load handler before setting src
+      iframe.onload = () => {
+        try {
+          // Small delay to ensure PDF is fully loaded
+          setTimeout(() => {
+            iframe.contentWindow?.print();
+          }, 250);
+        } catch (err) {
+          console.error("Error triggering print:", err);
+          alert("Failed to open print dialog");
+        }
+      };
+
+      iframe.src = url;
+      document.body.appendChild(iframe);
+
+      // Cleanup after a longer delay
+      setTimeout(() => {
+        try {
+          if (iframe.parentNode) {
+            document.body.removeChild(iframe);
+          }
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.error("Error cleaning up print iframe:", err);
+        }
+      }, 5000);
+    } catch (error) {
+      console.error("Error printing PDF:", error);
+      alert("Failed to print PDF");
+    }
+  }, []);
+
   const handleNew = useCallback(() => {
     if (
       confirm("Start with a new document? Any unsaved changes will be lost.")
@@ -111,6 +159,7 @@ function App() {
         onSave={handleSave}
         onSaveAs={handleSaveAs}
         onNew={handleNew}
+        onPrint={handlePrint}
         hasDocument={!!currentFile}
       />
       <main className="flex-1 relative overflow-hidden flex flex-col">

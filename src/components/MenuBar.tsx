@@ -7,6 +7,7 @@ import {
   Share,
   Github,
   Bug,
+  Printer,
 } from "lucide-react";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 
@@ -14,11 +15,12 @@ interface MenuBarProps {
   onSave: () => void;
   onSaveAs: () => void;
   onNew: () => void;
+  onPrint: () => void;
   hasDocument: boolean;
 }
 
 const MenuBar: React.FC<MenuBarProps> = memo(
-  ({ onSave, onSaveAs, onNew, hasDocument }) => {
+  ({ onSave, onSaveAs, onNew, onPrint, hasDocument }) => {
     return (
       <header className="flex justify-between items-center px-6 py-3 bg-card text-card-foreground border-b border-border h-16 shrink-0 z-50">
         <div className="flex items-center gap-2">
@@ -44,6 +46,16 @@ const MenuBar: React.FC<MenuBarProps> = memo(
           >
             <Save className="w-4 h-4" />
             Save
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onPrint}
+            disabled={!hasDocument}
+            title="Print PDF"
+          >
+            <Printer className="w-4 h-4" />
+            Print
           </Button>
           <Button
             variant="ghost"

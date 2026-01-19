@@ -58,6 +58,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = memo(({ onFileSelect }) => {
         accept="application/pdf"
         onChange={handleFileChange}
         className="hidden"
+        data-testid="pdf-upload-input"
       />
       <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200">
         <Upload className="w-10 h-10 text-indigo-500" />
