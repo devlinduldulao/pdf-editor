@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, Monitor, Palette } from "lucide-react";
-import { useTheme, type Theme } from "@/contexts/ThemeContext";
+import { useThemeStore, type Theme } from "@/stores/themeStore";
 
 const ThemeSwitcher: React.FC = () => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useThemeStore();
   const [isOpen, setIsOpen] = useState(false);
 
   const themes: Array<{ value: Theme; icon: React.ReactNode; label: string }> =
