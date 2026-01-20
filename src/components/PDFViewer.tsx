@@ -308,32 +308,36 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     }
   };
 
-  const handleOverlayDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isAddingText || !canvasRef.current?.firstChild) return;
+  const handleCanvasClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isAddingText) {
+       if (!canvasRef.current?.firstChild) return;
 
-    const canvas = canvasRef.current.firstChild as HTMLCanvasElement;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+      const canvas = canvasRef.current.firstChild as HTMLCanvasElement;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
 
-    // Convert to PDF coordinates
-    const pdfX = x / scale;
-    const pdfY = canvas.height / scale - y / scale;
+      // Convert to PDF coordinates
+      const pdfX = x / scale;
+      const pdfY = canvas.height / scale - y / scale;
 
-    const newAnnotation: TextAnnotation = {
-      id: `text_${Date.now()}`,
-      text: "",
-      x: pdfX,
-      y: pdfY,
-      pageNumber: currentPage,
-      fontSize: defaultFontSize,
-      isBold: false,
-      isItalic: false,
-    };
+      const newAnnotation: TextAnnotation = {
+        id: `text_${Date.now()}`,
+        text: "",
+        x: pdfX,
+        y: pdfY,
+        pageNumber: currentPage,
+        fontSize: defaultFontSize,
+        isBold: false,
+        isItalic: false,
+      };
 
-    setTextAnnotations((prev) => [...prev, newAnnotation]);
-    setSelectedAnnotationId(newAnnotation.id);
-    setIsAddingText(false); // Switch to edit mode immediately
+      setTextAnnotations((prev) => [...prev, newAnnotation]);
+      setSelectedAnnotationId(newAnnotation.id);
+      setIsAddingText(false); // Switch to edit mode immediately
+    } else {
+      setSelectedAnnotationId(null);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -809,35 +813,38 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
   return (
     <div className="flex flex-col h-full bg-slate-100/50">
       {/* Toolbar */}
-      <div className="h-14 border-b border-slate-200 bg-white shadow-sm flex items-center justify-between px-6 shrink-0 z-10 transition-all">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center bg-slate-100 p-1 rounded-lg">
+      <div className="h-auto min-h-14 border-b border-slate-200 bg-white shadow-sm flex flex-col md:flex-row items-center justify-between px-2 md:px-6 py-2 md:py-0 shrink-0 z-10 transition-all gap-2 md:gap-0">
+        <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-start overflow-x-auto no-scrollbar">
+          <div className="flex items-center bg-slate-100 p-1 rounded-lg shrink-0">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsAddingText(false)}
-              className={`h-8 px-3 gap-2 border-0 ${!isAddingText ? "bg-white shadow-sm text-slate-900 font-medium" : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
+              className={`h-8 px-2 md:px-3 gap-2 border-0 ${!isAddingText ? "bg-white shadow-sm text-slate-900 font-medium" : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
+              title="Select Mode"
             >
               <MousePointer2 className="w-4 h-4" />
-              <span className="text-xs">Select</span>
+              <span className="text-xs hidden md:inline">Select</span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsAddingText(true)}
-              className={`h-8 px-3 gap-2 border-0 ${isAddingText ? "bg-white shadow-sm text-indigo-600 font-medium" : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
+              className={`h-8 px-2 md:px-3 gap-2 border-0 ${isAddingText ? "bg-white shadow-sm text-indigo-600 font-medium" : "bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"}`}
+              title="Add Text"
             >
               <Type className="w-4 h-4" />
-              <span className="text-xs">Add Text</span>
+              <span className="text-xs hidden md:inline">Add Text</span>
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleImageSelect}
-              className="h-8 px-3 gap-2 border-0 bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+              className="h-8 px-2 md:px-3 gap-2 border-0 bg-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
+              title="Add Image"
             >
               <ImageIcon className="w-4 h-4" />
-              <span className="text-xs">Add Image</span>
+              <span className="text-xs hidden md:inline">Add Image</span>
             </Button>
             <input
               type="file"
@@ -848,70 +855,75 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             />
           </div>
 
-          <div className="h-6 w-px bg-slate-200" />
+          <div className="h-6 w-px bg-slate-200 mx-1 hidden md:block" />
 
           <Button
             onClick={handleApplyChanges}
             size="sm"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white h-8 text-xs font-medium px-4 shadow-sm active:scale-95 transition-all"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white h-8 text-xs font-medium px-3 md:px-4 shadow-sm active:scale-95 transition-all shrink-0 ml-auto md:ml-0"
+            title="Apply Fields"
           >
-            <Check className="w-3 h-3 mr-2" />
-            Apply Fields
+            <Check className="w-3 h-3 md:mr-2" />
+            <span className="hidden md:inline">Apply Fields</span>
+            <span className="md:hidden">Apply</span>
           </Button>
         </div>
 
-        <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
-          <Button
-            onClick={handlePrevPage}
-            disabled={currentPage <= 1}
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <span className="text-xs font-semibold text-slate-600 min-w-[3.5rem] text-center select-none tabular-nums">
-            {currentPage} <span className="text-slate-400 font-normal">/</span>{" "}
-            {numPages}
-          </span>
-          <Button
-            onClick={handleNextPage}
-            disabled={currentPage >= numPages}
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30"
-          >
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2 text-slate-600">
-          <div className="flex items-center bg-slate-100 rounded-lg p-1">
+        <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-end">
+          <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
             <Button
-              onClick={handleZoomOut}
+              onClick={handlePrevPage}
+              disabled={currentPage <= 1}
               variant="ghost"
               size="icon"
-              className="h-7 w-7 hover:bg-white hover:shadow-sm transition-all"
+              className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30"
             >
-              <ZoomOut className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-4 h-4" />
             </Button>
-            <span className="text-xs font-medium w-10 text-center select-none tabular-nums">
-              {Math.round(scale * 100)}%
+            <span className="text-xs font-semibold text-slate-600 min-w-14 text-center select-none tabular-nums">
+              {currentPage} <span className="text-slate-400 font-normal">/</span>{" "}
+              {numPages}
             </span>
             <Button
-              onClick={handleZoomIn}
+              onClick={handleNextPage}
+              disabled={currentPage >= numPages}
               variant="ghost"
               size="icon"
-              className="h-7 w-7 hover:bg-white hover:shadow-sm transition-all"
+              className="h-7 w-7 text-slate-500 hover:text-slate-900 hover:bg-slate-100 disabled:opacity-30"
             >
-              <ZoomIn className="w-3.5 h-3.5" />
+              <ChevronRight className="w-4 h-4" />
             </Button>
+          </div>
+
+          <div className="flex items-center gap-2 text-slate-600">
+            <div className="flex items-center bg-slate-100 rounded-lg p-1">
+              <Button
+                onClick={handleZoomOut}
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 hover:bg-white hover:shadow-sm transition-all"
+              >
+                <ZoomOut className="w-3.5 h-3.5" />
+              </Button>
+              <span className="text-xs font-medium w-10 text-center select-none tabular-nums">
+                {Math.round(scale * 100)}%
+              </span>
+              <Button
+                onClick={handleZoomIn}
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7 hover:bg-white hover:shadow-sm transition-all"
+              >
+                <ZoomIn className="w-3.5 h-3.5" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Canvas Area */}
-      <div className="flex-1 overflow-auto flex justify-center items-start p-8 relative bg-slate-100/50">
+      <div className="flex-1 overflow-auto flex justify-center items-start p-2 md:p-8 relative bg-slate-100/50">
+
         <div className="relative shadow-xl ring-1 ring-slate-900/5 transition-transform duration-200 ease-in-out group">
           <div
             ref={canvasRef}
@@ -921,10 +933,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             ref={overlayRef}
             data-testid="pdf-overlay"
             className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""}`}
-            onDoubleClick={handleOverlayDoubleClick}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            onClick={() => setSelectedAnnotationId(null)}
+            onClick={handleCanvasClick}
           >
             <div className="relative w-full h-full">
               {formFields.map((field) => renderFormField(field))}
@@ -941,11 +952,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
 
       {/* Floating Status / Toast */}
       {isAddingText && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white pl-3 pr-4 py-2 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-3 text-sm animate-in fade-in slide-in-from-bottom-4 z-50">
+        <div className="absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white pl-3 pr-4 py-2 rounded-full shadow-lg backdrop-blur-sm flex items-center gap-3 text-sm animate-in fade-in slide-in-from-bottom-4 z-50 whitespace-nowrap">
           <div className="bg-indigo-500 p-1 rounded-full">
             <Type className="w-3 h-3 text-white" />
           </div>
-          <span>Double-click anywhere to add text</span>
+          <span className="hidden md:inline">Double-click anywhere to add text</span>
+          <span className="md:hidden">Tap anyC add text</span>
           <div className="h-4 w-px bg-white/20 ml-1"></div>
           <Button
             variant="link"

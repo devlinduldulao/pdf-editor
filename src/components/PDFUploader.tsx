@@ -47,7 +47,7 @@ const PDFUploader: React.FC<PDFUploaderProps> = memo(({ onFileSelect }) => {
 
   return (
     <Card
-      className="w-full max-w-2xl flex flex-col items-center justify-center p-16 border-2 border-dashed border-slate-200 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:border-indigo-400 hover:bg-slate-50 cursor-pointer group"
+      className="w-full max-w-2xl flex flex-col items-center justify-center p-8 md:p-16 border-2 border-dashed border-slate-200 rounded-2xl bg-white shadow-sm transition-all duration-200 hover:border-indigo-400 hover:bg-slate-50 cursor-pointer group m-4"
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onClick={handleClick}
@@ -60,14 +60,14 @@ const PDFUploader: React.FC<PDFUploaderProps> = memo(({ onFileSelect }) => {
         className="hidden"
         data-testid="pdf-upload-input"
       />
-      <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200">
-        <Upload className="w-10 h-10 text-indigo-500" />
+      <div className="w-16 h-16 md:w-20 md:h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200">
+        <Upload className="w-8 h-8 md:w-10 md:h-10 text-indigo-500" />
       </div>
 
-      <h2 className="text-2xl font-semibold text-slate-800 mb-2">
+      <h2 className="text-xl md:text-2xl font-semibold text-slate-800 mb-2 text-center">
         Upload Document
       </h2>
-      <p className="text-slate-500 text-center max-w-sm mb-8">
+      <p className="text-slate-500 text-center max-w-sm mb-8 text-sm md:text-base">
         Drag and drop your PDF here, or click to browse files.
       </p>
 
