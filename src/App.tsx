@@ -156,7 +156,7 @@ function App() {
   }, []);
 
   return (
-    <div className="flex flex-col h-dvh overflow-hidden bg-slate-100 font-sans text-slate-900">
+    <div className="flex flex-col h-dvh overflow-hidden bg-background font-sans text-foreground">
       <MenuBar
         onSave={handleSave}
         onSaveAs={handleSaveAs}
