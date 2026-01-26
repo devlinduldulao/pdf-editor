@@ -1,0 +1,744 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+[90mstdout[2m | src/services/__tests__/pdfEditor.test.ts[2m > [22m[2mPDFEditorService[2m > [22m[2mshould add text to a page
+[22m[39mAdding text: {
+  id: [32m'1'[39m,
+  text: [32m'Hello World'[39m,
+  x: [33m100[39m,
+  y: [33m100[39m,
+  pageNumber: [33m1[39m,
+  fontSize: [33m12[39m
+}
+
+stderr | src/services/__tests__/pdfEditor.password.test.ts > PDFEditorService - Password Protection > should throw PDF_PASSWORD_REQUIRED when loading encrypted PDF without password
+PDF Load Error: Error: The document is encrypted and cannot be read without a password
+    at Object.<anonymous> (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/services/__tests__/pdfEditor.password.test.ts:44:27)
+    at Object.load (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at PDFEditorService.loadPDF (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/services/pdfEditor.ts:51:41)
+    at C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/services/__tests__/pdfEditor.password.test.ts:94:5
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:915:20
+
+[90mstdout[2m | src/services/__tests__/pdfEditor.test.ts[2m > [22m[2mPDFEditorService[2m > [22m[2mshould add an image to a page
+[22m[39mAdding image: img1
+
+[90mstdout[2m | src/services/__tests__/pdfEditor.password.test.ts[2m > [22m[2mPDFEditorService - Password Protection[2m > [22m[2mshould save password-protected PDF after modifications
+[22m[39mAdding text: {
+  id: [32m'test1'[39m,
+  text: [32m'Test Annotation'[39m,
+  x: [33m100[39m,
+  y: [33m100[39m,
+  pageNumber: [33m1[39m,
+  fontSize: [33m12[39m,
+  isBold: [33mfalse[39m,
+  isItalic: [33mfalse[39m
+}
+
+stderr | src/services/__tests__/pdfEditor.password.test.ts > PDFEditorService - Password Protection > should throw other errors that are not password-related
+PDF Load Error: Error: Corrupted PDF file
+    at Object.<anonymous> (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/services/__tests__/pdfEditor.password.test.ts:162:13)
+    at Object.load (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at PDFEditorService.loadPDF (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/services/pdfEditor.ts:51:41)
+    at C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/services/__tests__/pdfEditor.password.test.ts:170:5
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:915:20
+
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould merge class names[32m 5[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle conditional classes[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould merge tailwind classes correctly[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle arrays of classes[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle objects with boolean values[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle undefined and null values[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle empty strings[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle complex tailwind merging[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle padding and margin overrides[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle width and height overrides[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould preserve non-conflicting classes[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle responsive prefixes[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle pseudo-class prefixes[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould merge complex class combinations[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould return empty string for no arguments[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/lib/__tests__/utils.test.ts[2m > [22mcn utility[2m > [22mshould handle mixed types[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.test.ts[2m > [22mPDFEditorService[2m > [22mshould load a PDF from a File[32m 4[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.test.ts[2m > [22mPDFEditorService[2m > [22mshould add text to a page[32m 4[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.test.ts[2m > [22mPDFEditorService[2m > [22mshould add an image to a page[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.test.ts[2m > [22mPDFEditorService[2m > [22mshould reset state[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould load an unencrypted PDF without password[32m 3[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould throw PDF_PASSWORD_REQUIRED when loading encrypted PDF without password[32m 4[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould throw PDF_PASSWORD_REQUIRED when loading encrypted PDF with wrong password[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould successfully load encrypted PDF with correct password[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould save password-protected PDF after modifications[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould handle multiple password attempts[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/services/__tests__/pdfEditor.password.test.ts[2m > [22mPDFEditorService - Password Protection[2m > [22mshould throw other errors that are not password-related[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould initialize with system theme[32m 10[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould set theme to light[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould set theme to dark[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould set theme to dim[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould update actualTheme when theme changes[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould add theme class to document root[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould remove old theme class when changing themes[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould resolve system theme based on media query[32m 1[2mms[22m[39m
+ [2m[90mΓåô[39m[22m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould persist theme to localStorage
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould initialize theme on mount[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould handle all theme transitions[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/stores/__tests__/themeStore.test.ts[2m > [22mthemeStore[2m > [22mshould not throw error when window is undefined[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould render with default size[32m 26[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould render with small size[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould render with large size[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould render with extra large size[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould have spinning animation[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould have rounded border[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould have accessible loading text[32m 10[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould accept custom className[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould merge custom className with default classes[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould pass through additional props[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould have primary color border[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/components/ui/__tests__/loading-spinner.test.tsx[2m > [22mLoadingSpinner[2m > [22mshould have transparent top border[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFUploader.test.tsx[2m > [22mPDFUploader[2m > [22mcalls onFileSelect for a valid PDF[32m 60[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFUploader.test.tsx[2m > [22mPDFUploader[2m > [22malerts for invalid file type[32m 5[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFUploader.test.tsx[2m > [22mPDFUploader[2m > [22mhas an upload heading[32m 12[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould render the logo and title[32m 55[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould render all menu buttons[32m 13[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mrenders toolbar with navigation and tools
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mrenders toolbar with navigation and tools
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mrenders toolbar with navigation and tools
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Button Availability[2m > [22mshould show print button in MenuBar[32m 83[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Button Availability[2m > [22mshould disable print button when no document is loaded[32m 14[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould switch to Add Text mode when button is clicked
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould switch to Add Text mode when button is clicked
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould switch to Add Text mode when button is clicked
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mText Annotation Features[2m > [22m[2mshows floating message when Add Text mode is activated
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mText Annotation Features[2m > [22m[2mshows floating message when Add Text mode is activated
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mText Annotation Features[2m > [22m[2mshows floating message when Add Text mode is activated
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould render PDF overlay for interactions
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould render PDF overlay for interactions
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould render PDF overlay for interactions
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould render PDF overlay for interactions
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould render PDF overlay for interactions
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mComponent Initialization[2m > [22m[2mshould render PDF overlay for interactions
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mComponent Initialization[2m > [22mshould render PDF viewer with Add Text mode available[32m 58[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mComponent Initialization[2m > [22mshould switch to Add Text mode when button is clicked[32m 32[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mComponent Initialization[2m > [22mshould render PDF overlay for interactions[32m 9[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mrenders toolbar with navigation and tools[32m 62[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould render theme button[32m 167[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould show dropdown when clicked[32m 87[2mms[22m[39m
+stderr | src/__tests__/App.print.test.tsx > App - Print Functionality > Print Functionality > should call savePDF and create blob when print button is clicked
+Error printing PDF: TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'.
+    at Object.exports.convert (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:25:9)
+    at HTMLBodyElement.appendChild (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:404:26)
+    at HTMLBodyElement.appendChild (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at _temp (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:121:20)
+
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould not render when isOpen is false[32m 14[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould render when isOpen is true[32m 44[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mText Annotation Features[2m > [22m[2mdoes not create text annotation on single click in Add Text mode
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mText Annotation Features[2m > [22m[2mdoes not create text annotation on single click in Add Text mode
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mText Annotation Features[2m > [22m[2mdoes not create text annotation on single click in Add Text mode
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mrenders toolbar with Add Image button
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mrenders toolbar with Add Image button
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mrenders toolbar with Add Image button
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould call onNew when New button is clicked[32m 149[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould call onSave when Save button is clicked[32m 47[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mopens file dialog when Add Image is clicked
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mopens file dialog when Add Image is clicked
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mopens file dialog when Add Image is clicked
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mhandles image drop
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mhandles image drop
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mImage Features[2m > [22m[2mhandles image drop
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Functionality[2m > [22m[2mshould handle print with annotations applied
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Functionality[2m > [22m[2mshould handle print with annotations applied
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Functionality[2m > [22m[2mshould handle print with annotations applied
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Button Availability[2m > [22mshould enable print button when document is loaded[32m 39[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Functionality[2m > [22mshould call savePDF and create blob when print button is clicked[32m 74[2mms[22m[39m
+stderr | src/__tests__/App.print.test.tsx > App - Print Functionality > Print Functionality > should handle print with annotations applied
+Error printing PDF: TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'.
+    at Object.exports.convert (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:25:9)
+    at HTMLBodyElement.appendChild (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:404:26)
+    at HTMLBodyElement.appendChild (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at _temp (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:121:20)
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mToolbar and Mode Switching[2m > [22m[2mtoggles between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mToolbar and Mode Switching[2m > [22m[2mtoggles between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mToolbar and Mode Switching[2m > [22m[2mtoggles between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Error Handling[2m > [22m[2mshould show alert when savePDF throws error
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Error Handling[2m > [22m[2mshould show alert when savePDF throws error
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Error Handling[2m > [22m[2mshould show alert when savePDF throws error
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have bold formatting capability in component[32m 16[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have italic formatting capability in component[32m 9[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size increase capability in component[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size decrease capability in component[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have text deletion capability in component[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have combined formatting capabilities in component[32m 7[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size boundary controls in component[32m 7[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have toolbar persistence functionality in component[32m 6[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have multi-click formatting support in component[32m 5[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have bold and italic combination support in component[32m 6[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size increment controls in component[32m 7[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size decrement controls in component[32m 7[2mms[22m[39m
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mText Annotation Features[2m > [22mshows floating message when Add Text mode is activated[32m 39[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mText Annotation Features[2m > [22mdoes not create text annotation on single click in Add Text mode[32m 32[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mImage Features[2m > [22mrenders toolbar with Add Image button[32m 9[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mImage Features[2m > [22mopens file dialog when Add Image is clicked[32m 16[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mImage Features[2m > [22mhandles image drop[32m 12[2mms[22m[39m
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould work alongside save and export buttons
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould work alongside save and export buttons
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould work alongside save and export buttons
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould call onCancel when cancel button is clicked[32m 142[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould call onCancel when X button is clicked[32m 70[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould switch between Select and Add Text modes
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould call onPrint when Print button is clicked[32m 61[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould call onSaveAs when Export button is clicked[32m 62[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould disable Save button when hasDocument is false[32m 6[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould disable Print button when hasDocument is false[32m 6[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould disable Export button when hasDocument is false[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould enable Save button when hasDocument is true[32m 6[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould enable Print button when hasDocument is true[32m 7[2mms[22m[39m
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould maintain print button state after save operation
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould maintain print button state after save operation
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould maintain print button state after save operation
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould have all mode buttons available
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould have all mode buttons available
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22m[2mPDFViewer - Text Formatting Features[2m > [22m[2mMode Switching[2m > [22m[2mshould have all mode buttons available
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Functionality[2m > [22mshould handle print with annotations applied[32m 28[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Error Handling[2m > [22mshould show alert when savePDF throws error[32m 20[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Button Integration[2m > [22mshould work alongside save and export buttons[32m 27[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Button Integration[2m > [22mshould maintain print button state after save operation[32m 28[2mms[22m[39m
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould call savePDF for each print request
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould call savePDF for each print request
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint Button Integration[2m > [22m[2mshould call savePDF for each print request
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size minimum boundary in component[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have font size maximum boundary in component[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have toolbar visibility controls in component[32m 8[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have annotation deselection support in component[32m 9[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mText Formatting Features (Structure Tests)[2m > [22mshould have text annotation deletion in component[32m 6[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mMode Switching[2m > [22mshould switch between Select and Add Text modes[32m 21[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mMode Switching[2m > [22mshould have all mode buttons available[32m 9[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mIntegration Test Documentation[2m > [22mdocuments that formatting features are manually verified[32m 0[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.formatting.test.tsx[2m > [22mPDFViewer - Text Formatting Features[2m > [22mIntegration Test Documentation[2m > [22mverifies test count matches original implementation[32m 0[2mms[22m[39m
+stderr | src/__tests__/App.print.test.tsx > App - Print Functionality > Print Button Integration > should call savePDF for each print request
+Error printing PDF: TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'.
+    at Object.exports.convert (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:25:9)
+    at HTMLBodyElement.appendChild (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:404:26)
+    at HTMLBodyElement.appendChild (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at _temp (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:121:20)
+
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+stderr | src/__tests__/App.print.test.tsx > App - Print Functionality > Print Button Integration > should call savePDF for each print request
+Error printing PDF: TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'.
+    at Object.exports.convert (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:25:9)
+    at HTMLBodyElement.appendChild (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:404:26)
+    at HTMLBodyElement.appendChild (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at _temp (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:121:20)
+
+stderr | src/__tests__/App.print.test.tsx > App - Print Functionality > Print with Different Document States > should print newly loaded document
+Error printing PDF: TypeError: Failed to execute 'appendChild' on 'Node': parameter 1 is not of type 'Node'.
+    at Object.exports.convert (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:25:9)
+    at HTMLBodyElement.appendChild (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\jsdom\lib\jsdom\living\generated\Node.js:404:26)
+    at HTMLBodyElement.appendChild (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at _temp (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:121:20)
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint with Different Document States[2m > [22m[2mshould print newly loaded document
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint with Different Document States[2m > [22m[2mshould print newly loaded document
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint with Different Document States[2m > [22m[2mshould print newly loaded document
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mrenders uploader when no document loaded[32m 205[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mrenders main heading and description[32m 14[2mms[22m[39m
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould close dropdown when backdrop is clicked[32m 131[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mToolbar and Mode Switching[2m > [22mtoggles between Select and Add Text modes[32m 38[2mms[22m[39m
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mNavigation and Zoom[2m > [22m[2mdisplays zoom controls
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mNavigation and Zoom[2m > [22m[2mdisplays zoom controls
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx[2m > [22m[2mPDFViewer[2m > [22m[2mNavigation and Zoom[2m > [22m[2mdisplays zoom controls
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/components/__tests__/PDFViewer.test.tsx
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint with Different Document States[2m > [22m[2mshould disable print after starting new document
+[22m[39m≡ƒöì Extracting form fields from PDF...
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint with Different Document States[2m > [22m[2mshould disable print after starting new document
+[22m[39mPage 1: Found 0 annotations
+
+[90mstdout[2m | src/__tests__/App.print.test.tsx[2m > [22m[2mApp - Print Functionality[2m > [22m[2mPrint with Different Document States[2m > [22m[2mshould disable print after starting new document
+[22m[39mPage 2: Found 0 annotations
+Γ£à Total form fields found: 0 []
+
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould enable Export button when hasDocument is true[32m 5[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould render ThemeSwitcher component[32m 35[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mNavigation and Zoom[2m > [22mdisplays page navigation controls[32m 118[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PDFViewer.test.tsx[2m > [22mPDFViewer[2m > [22mNavigation and Zoom[2m > [22mdisplays zoom controls[32m 10[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint Button Integration[2m > [22mshould call savePDF for each print request[32m 34[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint with Different Document States[2m > [22mshould print newly loaded document[32m 26[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.print.test.tsx[2m > [22mApp - Print Functionality[2m > [22mPrint with Different Document States[2m > [22mshould disable print after starting new document[32m 33[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould call setTheme with light when Light is clicked[32m 127[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould not call handlers when disabled[32m 70[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould open GitHub link when GitHub button is clicked[32m 64[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/MenuBar.test.tsx[2m > [22mMenuBar[2m > [22mshould be memoized to prevent unnecessary re-renders[32m 15[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould call setTheme with dark when Dark is clicked[32m 126[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould call onSubmit with password when form is submitted[33m 349[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould call setTheme with dim when Dim is clicked[32m 109[2mms[22m[39m
+stderr | src/__tests__/App.test.tsx > App > shows password prompt when PDF requires password
+Error loading PDF: Error: PDF_PASSWORD_REQUIRED
+    at C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:92:7
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:915:26
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1209:10)
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:37
+    at Traces.$ (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/traces.CCmnQaNT.js:142:27)
+    at trace (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/test.B8ej_ZHS.js:239:21)
+    at runTest (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:12)
+
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mloads PDF and shows viewer after selecting file[33m 404[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mshows password prompt when PDF requires password[32m 95[2mms[22m[39m
+stderr | src/__tests__/App.test.tsx > App > closes password prompt when cancel is clicked
+Error loading PDF: Error: PDF_PASSWORD_REQUIRED
+    at C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:111:7
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:915:26
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1209:10)
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:37
+    at Traces.$ (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/traces.CCmnQaNT.js:142:27)
+    at trace (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/test.B8ej_ZHS.js:239:21)
+    at runTest (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:12)
+
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould call setTheme with system when System is clicked[32m 111[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould close dropdown after selecting a theme[32m 128[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould highlight current theme[32m 65[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould show correct icon for light theme[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould show correct icon for dark theme[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould show correct icon for dim theme[32m 2[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould show correct icon for system theme[32m 1[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould have correct title attribute[32m 8[2mms[22m[39m
+stderr | src/__tests__/App.test.tsx > App > retries loading with password when submitted
+Error loading PDF: Error: PDF_PASSWORD_REQUIRED
+    at Object.<anonymous> (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:139:15)
+    at Object.loadPDF (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at loadFile (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:22:29)
+    at Object.onFileSelect (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:63:5)
+    at onClick (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:21:17)
+    at executeDispatch (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19116:9)
+    at runWithFiberInDEV (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:874:13)
+    at processDispatchQueue (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19166:19)
+    at C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19767:9
+    at batchedUpdates$1 (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:3255:40)
+
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould clear password after submission[33m 332[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould show error message when isError is true[32m 5[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould not show error message when isError is false[32m 4[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould apply error styles to input when isError is true[32m 3[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould have password type on input field[32m 4[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould focus on input when opened[32m 3[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mcloses password prompt when cancel is clicked[32m 174[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/ThemeSwitcher.test.tsx[2m > [22mThemeSwitcher[2m > [22mshould toggle dropdown on button click[32m 174[2mms[22m[39m
+ [32mΓ£ô[39m src/components/__tests__/PasswordPrompt.test.tsx[2m > [22mPasswordPrompt[2m > [22mshould submit form on Enter key press[32m 249[2mms[22m[39m
+stderr | src/__tests__/App.test.tsx > App > shows error message for invalid PDF files
+Error loading PDF: Error: Invalid object ref
+    at C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:168:7
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:915:26
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1209:10)
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:37
+    at Traces.$ (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/traces.CCmnQaNT.js:142:27)
+    at trace (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/test.B8ej_ZHS.js:239:21)
+    at runTest (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:12)
+
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mretries loading with password when submitted[33m 346[2mms[22m[39m
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mshows error message for invalid PDF files[32m 78[2mms[22m[39m
+stderr | src/__tests__/App.test.tsx > App > shows generic error message for other errors
+Error loading PDF: Error: Network error
+    at C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:187:7
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:145:11
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:915:26
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1209:10)
+    at file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:37
+    at Traces.$ (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/traces.CCmnQaNT.js:142:27)
+    at trace (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/vitest/dist/chunks/test.B8ej_ZHS.js:239:21)
+    at runTest (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/runner/dist/index.js:1653:12)
+
+stderr | src/__tests__/App.test.tsx > App > shows password error when incorrect password provided
+Error loading PDF: Error: PDF_PASSWORD_REQUIRED
+    at Object.<anonymous> (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:209:15)
+    at Object.loadPDF (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at loadFile (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:22:29)
+    at Object.onFileSelect (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:63:5)
+    at onClick (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:21:17)
+    at executeDispatch (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19116:9)
+    at runWithFiberInDEV (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:874:13)
+    at processDispatchQueue (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19166:19)
+    at C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19767:9
+    at batchedUpdates$1 (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:3255:40)
+
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mshows generic error message for other errors[32m 64[2mms[22m[39m
+stderr | src/__tests__/App.test.tsx > App > shows password error when incorrect password provided
+Error loading PDF: Error: PDF_PASSWORD_REQUIRED
+    at Object.<anonymous> (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/__tests__/App.test.tsx:209:15)
+    at Object.loadPDF (file:///C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/node_modules/@vitest/spy/dist/index.js:285:34)
+    at loadFile (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:22:29)
+    at onSubmit (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/App.tsx:51:7)
+    at t1 (C:/Users/DEVDUL/Documents/DEVELOPMENT/pdf-editor/src/components/PasswordPrompt.tsx:20:9)
+    at executeDispatch (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19116:9)
+    at runWithFiberInDEV (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:874:13)
+    at processDispatchQueue (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19166:19)
+    at C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:19767:9
+    at batchedUpdates$1 (C:\Users\DEVDUL\Documents\DEVELOPMENT\pdf-editor\node_modules\react-dom\cjs\react-dom-client.development.js:3255:40)
+
+ [32mΓ£ô[39m src/__tests__/App.test.tsx[2m > [22mApp[2m > [22mshows password error when incorrect password provided[32m 283[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m13 passed[39m[22m[90m (13)[39m
+[2m      Tests [22m [1m[32m149 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (150)[39m
+[2m   Start at [22m 08:32:46
+[2m   Duration [22m 6.18s[2m (transform 5.84s, setup 4.23s, import 11.15s, tests 5.94s, environment 28.09s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   56.53 |    49.42 |   34.96 |   57.44 |                   
+ src               |   84.05 |    89.23 |   66.66 |   80.35 |                   
+  App.tsx          |   84.05 |    89.23 |   66.66 |   80.35 | ...09-116,125-131 
+ src/components    |   52.58 |    47.29 |   23.46 |   49.76 |                   
+  MenuBar.tsx      |   92.18 |    78.57 |     100 |   94.59 | 53,63             
+  PDFUploader.tsx  |   68.18 |       50 |      50 |   74.28 | 20,26-33,39,45    
+  PDFViewer.tsx    |   30.72 |     19.4 |   13.09 |   31.63 | ...99,810,941-966 
+  ...ordPrompt.tsx |   92.59 |    84.44 |     100 |     100 | 50,57,67-68       
+  ...eSwitcher.tsx |   90.47 |    68.75 |     100 |     100 | 26-37,70          
+ src/components/ui |   31.57 |    28.03 |   36.36 |   40.67 |                   
+  button.tsx       |   85.71 |       80 |     100 |    87.5 | 41                
+  card.tsx         |   11.53 |     8.47 |   14.28 |   15.62 | 9,20-82           
+  checkbox.tsx     |       0 |        0 |       0 |       0 | 6-23              
+  input.tsx        |   81.81 |    55.55 |     100 |     100 | 6-14              
+  ...g-spinner.tsx |      75 |    57.14 |     100 |     100 | 7-24              
+ src/contexts      |   71.42 |    46.66 |   66.66 |   76.47 |                   
+  ThemeContext.tsx |   71.42 |    46.66 |   66.66 |   76.47 | 14-17,53,72-74    
+ src/lib           |     100 |      100 |     100 |     100 |                   
+  utils.ts         |     100 |      100 |     100 |     100 |                   
+ src/services      |   58.66 |    56.75 |      60 |   61.42 |                   
+  pdfEditor.ts     |   58.66 |    56.75 |      60 |   61.42 | ...35-152,163-173 
+ src/stores        |   86.36 |       60 |      80 |   90.47 |                   
+  themeStore.ts    |   86.36 |       60 |      80 |   90.47 | 63-64             
+-------------------|---------|----------|---------|---------|-------------------
