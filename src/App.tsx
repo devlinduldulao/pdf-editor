@@ -1,74 +1,66 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense, lazy } from "react";
 import MenuBar from "./components/MenuBar";
 import PDFUploader from "./components/PDFUploader";
-import PDFViewer from "./components/PDFViewer";
 import { pdfEditorService } from "./services/pdfEditor";
+import { PasswordPrompt } from "./components/PasswordPrompt";
+import { LoadingSpinner } from "./components/ui/loading-spinner";
+import { AlertCircle } from "lucide-react";
+
+// Lazy load the heavy PDF viewer
+const PDFViewer = lazy(() => import("./components/PDFViewer"));
 
 function App() {
   const [currentFile, setCurrentFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
+  const [isPasswordPromptOpen, setIsPasswordPromptOpen] = useState(false);
+  const [isPasswordError, setIsPasswordError] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleFileSelect = useCallback(async (file: File) => {
-    const attemptLoad = async (password?: string): Promise<boolean> => {
-      try {
-        await pdfEditorService.loadPDF(file, password);
-        setCurrentFile(file);
-        setFileName(file.name);
-        return true;
-      } catch (error: any) {
-        console.error("Error loading PDF:", error);
-        // Check if it's specifically the password required error
-        if (error.message === "PDF_PASSWORD_REQUIRED") {
-          return false;
-        }
-        // For other errors, throw them
-        throw error;
-      }
-    };
-
+  const loadFile = async (file: File, password?: string) => {
     try {
-      // First attempt without password
-      const success = await attemptLoad();
-      if (!success) {
-        // PDF is password protected, prompt user
-        const password = prompt(
-          "This PDF is password-protected. Please enter the password:",
-        );
-        if (password) {
-          const retrySuccess = await attemptLoad(password);
-          if (!retrySuccess) {
-            alert("Incorrect password. Please try again.");
-            // Retry one more time
-            const retryPassword = prompt(
-              "Incorrect password. Please try again:",
-            );
-            if (retryPassword) {
-              const finalSuccess = await attemptLoad(retryPassword);
-              if (!finalSuccess) {
-                alert("Failed to open PDF: Incorrect password");
-              }
-            }
-          }
-        }
-      }
+      await pdfEditorService.loadPDF(file, password);
+      setCurrentFile(file);
+      setFileName(file.name);
+      setIsPasswordPromptOpen(false);
+      setIsPasswordError(false);
+      setPendingFile(null);
+      setError(null);
+      return true;
     } catch (error: any) {
       console.error("Error loading PDF:", error);
-
-      const errorMessage = error.message || String(error);
-
-      // If it's a parsing error or object ref error, inform the user specifically
-      if (
-        errorMessage.includes("Invalid object ref") ||
-        errorMessage.includes("parse")
-      ) {
-        alert(
-          "Parse Error: The PDF file structure is invalid or not supported by the editor.",
-        );
-        return; // Stop processing
+      if (error.message === "PDF_PASSWORD_REQUIRED") {
+        setPendingFile(file);
+        setIsPasswordPromptOpen(true);
+        setIsPasswordError(!!password); // If we provided a password and it failed, it's an error
+        return false;
       }
 
-      alert("Failed to load PDF file: " + errorMessage);
+      const errorMessage = error.message || String(error);
+      if (errorMessage.includes("Invalid object ref") || errorMessage.includes("parse")) {
+        setError("The PDF file structure is invalid or not supported.");
+      } else {
+        setError(`Failed to load PDF: ${errorMessage}`);
+      }
+      return false;
     }
+  };
+
+  const handlePasswordSubmit = (password: string) => {
+    if (pendingFile) {
+      loadFile(pendingFile, password);
+    }
+  };
+
+  const handlePasswordCancel = () => {
+    setIsPasswordPromptOpen(false);
+    setPendingFile(null);
+    setIsPasswordError(false);
+  };
+
+  const handleFileSelect = useCallback((file: File) => {
+    setError(null);
+    loadFile(file);
   }, []);
 
   const handleSave = useCallback(async () => {
@@ -156,7 +148,14 @@ function App() {
   }, []);
 
   return (
-    <div className="flex flex-col h-dvh overflow-hidden bg-background font-sans text-foreground">
+    <div className="min-h-screen bg-background font-sans text-foreground antialiased selection:bg-primary/20 selection:text-primary">
+      <PasswordPrompt
+        isOpen={isPasswordPromptOpen}
+        onSubmit={handlePasswordSubmit}
+        onCancel={handlePasswordCancel}
+        isError={isPasswordError}
+      />
+
       <MenuBar
         onSave={handleSave}
         onSaveAs={handleSaveAs}
@@ -164,15 +163,49 @@ function App() {
         onPrint={handlePrint}
         hasDocument={!!currentFile}
       />
-      <main className="flex-1 relative overflow-hidden flex flex-col">
-        {currentFile ? (
-          <PDFViewer file={currentFile} />
-        ) : (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <PDFUploader onFileSelect={handleFileSelect} />
+
+      <main className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500">
+        <div className="space-y-8">
+          <div className="text-center space-y-4 pt-8">
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500 pb-2 font-display">
+              PDF Editor
+            </h1>
+            <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
+              Securely edit, sign, and annotate your PDF documents locally.
+            </p>
           </div>
-        )}
+
+          {!currentFile && (
+            <div className="max-w-xl mx-auto mt-12 transform transition-all hover:scale-[1.01] duration-300">
+              <PDFUploader onFileSelect={handleFileSelect} />
+
+              {error && (
+                <div className="mt-4 p-4 bg-destructive/10 border-destructive/20 border rounded-lg flex items-center gap-3 text-destructive animate-in slide-in-from-top-2">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <p className="font-medium">{error}</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {currentFile && (
+            <div className="relative rounded-xl overflow-hidden border border-border/50 shadow-2xl bg-card">
+              <Suspense
+                fallback={
+                  <div className="h-[80vh] flex flex-col items-center justify-center gap-4 bg-muted/30">
+                    <LoadingSpinner size="xl" />
+                    <p className="text-muted-foreground animate-pulse font-medium">Loading PDF Viewer...</p>
+                  </div>
+                }
+              >
+                <PDFViewer file={currentFile} />
+              </Suspense>
+            </div>
+          )}
+        </div>
       </main>
+
+      <div className="fixed inset-0 -z-10 h-full w-full bg-background [background:radial-gradient(125%_125%_at_50%_10%,var(--background)_40%,var(--primary)_100%)] opacity-5 pointer-events-none dark:opacity-20 mix-blend-overlay" />
     </div>
   );
 }
