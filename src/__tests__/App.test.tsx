@@ -203,7 +203,7 @@ describe("App", () => {
 
   it("shows password error when incorrect password provided", async () => {
     let callCount = 0;
-    vi.mocked(pdfEditorService.loadPDF).mockImplementation(async (file, password) => {
+    vi.mocked(pdfEditorService.loadPDF).mockImplementation(async (_file, password) => {
       callCount++;
       if (!password || callCount < 3) {
         throw new Error("PDF_PASSWORD_REQUIRED");
