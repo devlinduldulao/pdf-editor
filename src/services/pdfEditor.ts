@@ -176,6 +176,7 @@ export class PDFEditorService {
   reset(): void {
     this.pdfDoc = null;
     this.originalBytes = null;
+    this.password = undefined;
   }
 }
 

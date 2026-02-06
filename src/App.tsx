@@ -167,7 +167,7 @@ function App() {
       <main className="container mx-auto px-4 py-8 max-w-7xl animate-in fade-in duration-500">
         <div className="space-y-8">
           <div className="text-center space-y-4 pt-8">
-            <h1 className="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-purple-500 to-pink-500 pb-2 font-display">
+            <h1 className="text-4xl md:text-6xl font-black tracking-tighter bg-clip-text text-transparent bg-linear-to-r from-primary via-purple-500 to-pink-500 pb-2 font-display">
               PDF Editor
             </h1>
             <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto font-light leading-relaxed">
@@ -181,7 +181,7 @@ function App() {
 
               {error && (
                 <div className="mt-4 p-4 bg-destructive/10 border-destructive/20 border rounded-lg flex items-center gap-3 text-destructive animate-in slide-in-from-top-2">
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                  <AlertCircle className="w-5 h-5 shrink-0" />
                   <p className="font-medium">{error}</p>
                 </div>
               )}
