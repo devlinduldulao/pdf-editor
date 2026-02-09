@@ -9,7 +9,7 @@ import PageThumbnails from "@/components/PageThumbnails";
 import { DrawingToolbar, DrawingCanvas, type DrawingTool, type DrawingPath, type DrawingShape } from "@/components/DrawingTools";
 import SearchBar, { SearchHighlightsOverlay, type SearchHighlight } from "@/components/SearchBar";
 import SignaturePad from "@/components/SignaturePad";
-import { RedactionToolbar, RedactionCanvas, type Redaction } from "@/components/RedactionTools";
+import { RedactionCanvas, type Redaction } from "@/components/RedactionTools";
 import WatermarkModal, { type WatermarkConfig } from "@/components/WatermarkModal";
 import HeaderFooterModal, { type HeaderFooterConfig } from "@/components/HeaderFooterModal";
 import PasswordProtectModal, { type PasswordProtectionConfig } from "@/components/PasswordProtectModal";
@@ -1139,235 +1139,275 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
 
   return (
     <div className="flex flex-col h-full bg-muted/50">
-      {/* Toolbar */}
-      <div className="h-auto min-h-14 border-b border-border bg-card shadow-sm flex flex-col md:flex-row items-center justify-between px-2 md:px-6 py-2 md:py-0 shrink-0 z-10 transition-all gap-2 md:gap-0">
-        <div className="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-start overflow-x-auto no-scrollbar">
-          <div className="flex items-center bg-muted p-1 rounded-lg shrink-0">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsAddingText(false)}
-              className={`h-8 px-2 md:px-3 gap-2 border-0 ${!isAddingText ? "bg-card shadow-sm text-card-foreground font-medium" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
-              title="Select Mode"
-            >
-              <MousePointer2 className="w-4 h-4" />
-              <span className="text-xs hidden md:inline">Select</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsAddingText(true)}
-              className={`h-8 px-2 md:px-3 gap-2 border-0 ${isAddingText ? "bg-card shadow-sm text-primary font-medium" : "bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}
-              title="Add Text"
-            >
-              <Type className="w-4 h-4" />
-              <span className="text-xs hidden md:inline">Add Text</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleImageSelect}
-              className="h-8 px-2 md:px-3 gap-2 border-0 bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              title="Add Image"
-            >
-              <ImageIcon className="w-4 h-4" />
-              <span className="text-xs hidden md:inline">Add Image</span>
-            </Button>
-            <input
-              type="file"
-              ref={imageInputRef}
-              className="hidden"
-              accept="image/*"
-              onChange={handleImageUpload}
+      {/* Toolbar - Two rows on mobile, single row on desktop */}
+      <div className="border-b border-border bg-card shadow-sm shrink-0 z-10">
+        {/* Top Row - Primary Actions */}
+        <div className="flex items-center justify-between px-2 md:px-4 py-2 gap-2">
+          {/* Left: Core Edit Tools */}
+          <div className="flex items-center gap-1 md:gap-2 overflow-x-auto no-scrollbar">
+            {/* Select/Text/Image Toggle */}
+            <div className="flex items-center bg-muted p-0.5 rounded-lg shrink-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsAddingText(false)}
+                className={`h-7 px-2 gap-1 border-0 ${!isAddingText ? "bg-card shadow-sm text-card-foreground font-medium" : "bg-transparent text-muted-foreground hover:text-foreground"}`}
+                title="Select Mode"
+              >
+                <MousePointer2 className="w-3.5 h-3.5" />
+                <span className="text-xs hidden sm:inline">Select</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsAddingText(true)}
+                className={`h-7 px-2 gap-1 border-0 ${isAddingText ? "bg-card shadow-sm text-primary font-medium" : "bg-transparent text-muted-foreground hover:text-foreground"}`}
+                title="Add Text"
+              >
+                <Type className="w-3.5 h-3.5" />
+                <span className="text-xs hidden sm:inline">Text</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleImageSelect}
+                className="h-7 px-2 gap-1 border-0 bg-transparent text-muted-foreground hover:text-foreground"
+                title="Add Image"
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span className="text-xs hidden sm:inline">Image</span>
+              </Button>
+              <input
+                type="file"
+                ref={imageInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleImageUpload}
+              />
+            </div>
+
+            {/* Drawing Tools - Compact */}
+            <DrawingToolbar
+              currentTool={currentDrawingTool}
+              onToolChange={setCurrentDrawingTool}
+              currentColor={drawingColor}
+              onColorChange={setDrawingColor}
+              strokeWidth={drawingStrokeWidth}
+              onStrokeWidthChange={setDrawingStrokeWidth}
+              onClear={handleClearDrawings}
+              isActive={isDrawingMode}
+              onToggle={toggleDrawingMode}
             />
+
+            {/* More Tools Dropdown */}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
+                className="h-7 px-2 gap-1 border-0 bg-transparent text-muted-foreground hover:text-foreground"
+                title="More Tools"
+              >
+                <MoreHorizontal className="w-3.5 h-3.5" />
+                <span className="text-xs hidden md:inline">More</span>
+              </Button>
+              {isToolsMenuOpen && (
+                <div className="absolute top-full left-0 mt-1 z-50 bg-card border border-border rounded-lg shadow-xl p-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-100">
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsSignatureModalOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <PenTool className="w-4 h-4" />
+                    Add Signature
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      toggleRedactionMode();
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <div className="w-4 h-4 bg-current rounded-sm opacity-80" />
+                    {isRedactionMode ? "Exit Redaction" : "Redaction Tool"}
+                    {redactions.filter(r => r.pageNumber === currentPage).length > 0 && (
+                      <span className="ml-auto text-xs bg-destructive/10 text-destructive px-1.5 rounded-full">
+                        {redactions.filter(r => r.pageNumber === currentPage).length}
+                      </span>
+                    )}
+                  </button>
+                  <div className="h-px bg-border my-1" />
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsSearchOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Search className="w-4 h-4" />
+                    Search (Ctrl+F)
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsWatermarkModalOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Droplets className="w-4 h-4" />
+                    Add Watermark
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsHeaderFooterModalOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <FileText className="w-4 h-4" />
+                    Header/Footer
+                  </button>
+                  <div className="h-px bg-border my-1" />
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsPasswordModalOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Lock className="w-4 h-4" />
+                    Password Protect
+                  </button>
+                  {redactions.filter(r => r.pageNumber === currentPage).length > 0 && (
+                    <>
+                      <div className="h-px bg-border my-1" />
+                      <button
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted text-destructive transition-colors"
+                        onClick={() => {
+                          handleClearRedactions();
+                          setIsToolsMenuOpen(false);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Clear Redactions
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
-
-          {/* Drawing Tools */}
-          <DrawingToolbar
-            currentTool={currentDrawingTool}
-            onToolChange={setCurrentDrawingTool}
-            currentColor={drawingColor}
-            onColorChange={setDrawingColor}
-            strokeWidth={drawingStrokeWidth}
-            onStrokeWidthChange={setDrawingStrokeWidth}
-            onClear={handleClearDrawings}
-            isActive={isDrawingMode}
-            onToggle={toggleDrawingMode}
-          />
-
-          {/* Signature Tool */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsSignatureModalOpen(true)}
-            className="h-8 px-2 md:px-3 gap-2 border-0 bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-            title="Add Signature"
-          >
-            <PenTool className="w-4 h-4" />
-            <span className="text-xs hidden lg:inline">Sign</span>
-          </Button>
-
-          {/* Redaction Tool */}
-          <RedactionToolbar
-            isActive={isRedactionMode}
-            onToggle={toggleRedactionMode}
-            redactionCount={redactions.filter(r => r.pageNumber === currentPage).length}
-            onClearAll={handleClearRedactions}
-          />
-
-          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
-
-          {/* More Tools Dropdown (for less common features) */}
-          <div className="relative">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
-              className="h-8 px-2 gap-1 border-0 bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              title="More Tools"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-              <span className="text-xs hidden lg:inline">More</span>
-            </Button>
-            {isToolsMenuOpen && (
-              <div className="absolute top-full left-0 mt-1 z-50 bg-card border border-border rounded-lg shadow-xl p-1 min-w-[160px] animate-in fade-in zoom-in-95 duration-100">
-                <button
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                  onClick={() => {
-                    setIsSearchOpen(true);
-                    setIsToolsMenuOpen(false);
-                  }}
-                >
-                  <Search className="w-4 h-4" />
-                  Search (Ctrl+F)
-                </button>
-                <button
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                  onClick={() => {
-                    setIsWatermarkModalOpen(true);
-                    setIsToolsMenuOpen(false);
-                  }}
-                >
-                  <Droplets className="w-4 h-4" />
-                  Add Watermark
-                </button>
-                <button
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                  onClick={() => {
-                    setIsHeaderFooterModalOpen(true);
-                    setIsToolsMenuOpen(false);
-                  }}
-                >
-                  <FileText className="w-4 h-4" />
-                  Header/Footer
-                </button>
-                <div className="h-px bg-border my-1" />
-                <button
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                  onClick={() => {
-                    setIsPasswordModalOpen(true);
-                    setIsToolsMenuOpen(false);
-                  }}
-                >
-                  <Lock className="w-4 h-4" />
-                  Password Protect
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
-
-          {/* Undo/Redo buttons */}
-          <div className="flex items-center bg-muted p-1 rounded-lg shrink-0">
+          {/* Center: Undo/Redo */}
+          <div className="hidden md:flex items-center bg-muted p-0.5 rounded-lg">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleUndo}
               disabled={!canUndo()}
-              className="h-8 px-2 gap-1 border-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
+              className="h-7 px-2 gap-1 border-0 text-muted-foreground hover:text-foreground disabled:opacity-30"
               title="Undo (Ctrl+Z)"
             >
-              <Undo2 className="w-4 h-4" />
-              <span className="text-xs hidden lg:inline">Undo</span>
+              <Undo2 className="w-3.5 h-3.5" />
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={handleRedo}
               disabled={!canRedo()}
-              className="h-8 px-2 gap-1 border-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
+              className="h-7 px-2 gap-1 border-0 text-muted-foreground hover:text-foreground disabled:opacity-30"
               title="Redo (Ctrl+Y)"
             >
-              <Redo2 className="w-4 h-4" />
-              <span className="text-xs hidden lg:inline">Redo</span>
+              <Redo2 className="w-3.5 h-3.5" />
             </Button>
           </div>
 
-          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
-
+          {/* Right: Apply Button - Always Visible */}
           <Button
             onClick={handleApplyChanges}
             size="sm"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-xs font-medium px-3 md:px-4 shadow-sm active:scale-95 transition-all shrink-0 ml-auto md:ml-0"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground h-8 text-xs font-medium px-3 shadow-sm active:scale-95 transition-all shrink-0"
             title="Apply Fields"
           >
-            <Check className="w-3 h-3 md:mr-2" />
-            <span className="hidden md:inline">Apply Fields</span>
-            <span className="md:hidden">Apply</span>
+            <Check className="w-3.5 h-3.5 mr-1" />
+            <span>Apply</span>
           </Button>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-between md:justify-end">
-          <div className="flex items-center gap-3 bg-card border border-border rounded-lg p-1 shadow-sm">
+        {/* Bottom Row - Navigation & Zoom */}
+        <div className="flex items-center justify-between px-2 md:px-4 py-1.5 border-t border-border/50 bg-muted/30">
+          {/* Mobile Undo/Redo */}
+          <div className="flex md:hidden items-center bg-muted p-0.5 rounded-lg">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUndo}
+              disabled={!canUndo()}
+              className="h-7 px-2 border-0 text-muted-foreground hover:text-foreground disabled:opacity-30"
+              title="Undo"
+            >
+              <Undo2 className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRedo}
+              disabled={!canRedo()}
+              className="h-7 px-2 border-0 text-muted-foreground hover:text-foreground disabled:opacity-30"
+              title="Redo"
+            >
+              <Redo2 className="w-3.5 h-3.5" />
+            </Button>
+          </div>
+
+          {/* Page Navigation */}
+          <div className="flex items-center bg-card border border-border rounded-lg p-0.5 shadow-sm">
             <Button
               onClick={handlePrevPage}
               disabled={currentPage <= 1}
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </Button>
-            <span className="text-xs font-semibold text-muted-foreground min-w-14 text-center select-none tabular-nums">
-              {currentPage} <span className="text-muted-foreground/50 font-normal">/</span>{" "}
-              {numPages}
+            <span className="text-xs font-medium text-muted-foreground min-w-12 text-center select-none tabular-nums">
+              {currentPage} <span className="opacity-50">/</span> {numPages}
             </span>
             <Button
               onClick={handleNextPage}
               disabled={currentPage >= numPages}
               variant="ghost"
               size="icon"
-              className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted disabled:opacity-30"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </Button>
           </div>
 
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="flex items-center bg-muted rounded-lg p-1">
-              <Button
-                onClick={handleZoomOut}
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 hover:bg-card hover:shadow-sm transition-all"
-              >
-                <ZoomOut className="w-3.5 h-3.5" />
-              </Button>
-              <span className="text-xs font-medium w-10 text-center select-none tabular-nums">
-                {Math.round(scale * 100)}%
-              </span>
-              <Button
-                onClick={handleZoomIn}
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 hover:bg-card hover:shadow-sm transition-all"
-              >
-                <ZoomIn className="w-3.5 h-3.5" />
-              </Button>
-            </div>
+          {/* Zoom Controls */}
+          <div className="flex items-center bg-muted rounded-lg p-0.5">
+            <Button
+              onClick={handleZoomOut}
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 hover:bg-card transition-all"
+            >
+              <ZoomOut className="w-3 h-3" />
+            </Button>
+            <span className="text-xs font-medium w-10 text-center select-none tabular-nums text-muted-foreground">
+              {Math.round(scale * 100)}%
+            </span>
+            <Button
+              onClick={handleZoomIn}
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 hover:bg-card transition-all"
+            >
+              <ZoomIn className="w-3 h-3" />
+            </Button>
           </div>
         </div>
       </div>
