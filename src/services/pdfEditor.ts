@@ -750,6 +750,259 @@ export class PDFEditorService {
     }
   }
 
+  // ========== Flatten Annotations Method ==========
+
+  /**
+   * Flattens the PDF by removing form interactivity.
+   * This makes form fields non-editable and embeds their values permanently.
+   * Useful for form submissions where you want to prevent further edits.
+   */
+  async flattenAnnotations(): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const form = this.pdfDoc.getForm();
+    
+    try {
+      // Flatten the form - this makes all form fields non-editable
+      // and embeds their current values as static content
+      form.flatten();
+    } catch (error) {
+      console.error("Error flattening form:", error);
+      throw error;
+    }
+  }
+
+  // ========== Bookmark/Outline Methods ==========
+
+  /**
+   * Gets the PDF outline (bookmarks/table of contents).
+   * Note: pdf-lib has limited support for reading outlines.
+   */
+  getOutline(): Array<{ title: string; pageIndex: number }> {
+    // pdf-lib doesn't have direct outline reading support
+    // This would require parsing the PDF structure manually
+    // For now, return empty array - can be enhanced with PDF.js for reading
+    return [];
+  }
+
+  /**
+   * Adds a bookmark to the PDF.
+   * Note: pdf-lib has limited outline creation support.
+   * 
+   * @param title - The bookmark title
+   * @param pageIndex - The page to link to (0-based)
+   */
+  async addBookmark(title: string, pageIndex: number): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+    
+    // pdf-lib doesn't have built-in bookmark creation
+    // Bookmarks require creating outline dictionary entries
+    // This is a placeholder for future implementation
+    console.log(`Bookmark "${title}" -> Page ${pageIndex + 1} (feature limited by pdf-lib)`);
+  }
+
+  // ========== Link Annotation Methods ==========
+
+  /**
+   * Adds a URL link annotation to a page.
+   * 
+   * @param pageIndex - The page index (0-based)
+   * @param rect - The rectangle area for the link [x, y, width, height]
+   * @param url - The URL to link to
+   */
+  async addUrlLink(
+    pageIndex: number,
+    rect: { x: number; y: number; width: number; height: number },
+    url: string
+  ): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+    if (pageIndex < 0 || pageIndex >= pages.length) {
+      throw new Error("Invalid page index");
+    }
+
+    const page = pages[pageIndex];
+    const pageHeight = page.getHeight();
+
+    // Draw a blue underline/border to indicate a link
+    page.drawRectangle({
+      x: rect.x,
+      y: pageHeight - rect.y - rect.height,
+      width: rect.width,
+      height: rect.height,
+      borderColor: rgb(0, 0, 0.8),
+      borderWidth: 0.5,
+      opacity: 0.1,
+      color: rgb(0, 0, 0.8),
+    });
+
+    // Note: pdf-lib doesn't have direct link annotation support
+    // The visual indicator is added, but true hyperlinks require
+    // lower-level PDF manipulation or using a different library
+    console.log(`Link to ${url} added visually at page ${pageIndex + 1}`);
+  }
+
+  /**
+   * Adds an internal page link (goto link).
+   * 
+   * @param sourcePageIndex - The source page (0-based)
+   * @param rect - The rectangle area for the link
+   * @param targetPageIndex - The target page to navigate to (0-based)
+   */
+  async addPageLink(
+    sourcePageIndex: number,
+    rect: { x: number; y: number; width: number; height: number },
+    targetPageIndex: number
+  ): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+    if (sourcePageIndex < 0 || sourcePageIndex >= pages.length) {
+      throw new Error("Invalid source page index");
+    }
+    if (targetPageIndex < 0 || targetPageIndex >= pages.length) {
+      throw new Error("Invalid target page index");
+    }
+
+    const page = pages[sourcePageIndex];
+    const pageHeight = page.getHeight();
+
+    // Draw a visual indicator for the internal link
+    page.drawRectangle({
+      x: rect.x,
+      y: pageHeight - rect.y - rect.height,
+      width: rect.width,
+      height: rect.height,
+      borderColor: rgb(0.1, 0.5, 0.1),
+      borderWidth: 0.5,
+      opacity: 0.1,
+      color: rgb(0.1, 0.5, 0.1),
+    });
+
+    console.log(`Page link from page ${sourcePageIndex + 1} to page ${targetPageIndex + 1}`);
+  }
+
+  // ========== Sticky Notes/Comments Methods ==========
+
+  /**
+   * Adds a sticky note annotation to a page.
+   * 
+   * @param annotation - The sticky note configuration
+   */
+  async addStickyNote(annotation: {
+    pageNumber: number;
+    x: number;
+    y: number;
+    content: string;
+    author?: string;
+    color?: string;
+  }): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+    const page = pages[annotation.pageNumber - 1];
+    if (!page) throw new Error("Invalid page number");
+
+    const pageHeight = page.getHeight();
+    const noteColor = annotation.color ? hexToRgb(annotation.color) : { r: 1, g: 1, b: 0.6 };
+
+    // Draw a small sticky note icon/box
+    const noteSize = 20;
+    page.drawRectangle({
+      x: annotation.x,
+      y: pageHeight - annotation.y - noteSize,
+      width: noteSize,
+      height: noteSize,
+      color: rgb(noteColor.r, noteColor.g, noteColor.b),
+      borderColor: rgb(0.8, 0.6, 0),
+      borderWidth: 1,
+    });
+
+    // Add the content as a text annotation nearby (collapsed state)
+    if (annotation.content) {
+      const font = await this.pdfDoc.embedFont(StandardFonts.Helvetica);
+      const fontSize = 8;
+      
+      // Draw a small popup-like box for the content
+      const textWidth = Math.min(font.widthOfTextAtSize(annotation.content.substring(0, 30), fontSize), 150);
+      
+      page.drawRectangle({
+        x: annotation.x + noteSize + 5,
+        y: pageHeight - annotation.y - 40,
+        width: textWidth + 10,
+        height: 35,
+        color: rgb(1, 1, 0.9),
+        borderColor: rgb(0.8, 0.6, 0),
+        borderWidth: 0.5,
+      });
+
+      page.drawText(annotation.content.substring(0, 50), {
+        x: annotation.x + noteSize + 10,
+        y: pageHeight - annotation.y - 25,
+        size: fontSize,
+        font,
+        color: rgb(0.2, 0.2, 0.2),
+        maxWidth: 140,
+      });
+    }
+  }
+
+  // ========== Export to Images Methods ==========
+
+  /**
+   * Exports a single page to image bytes.
+   * Note: This requires canvas rendering which is handled by PDF.js in the component.
+   * This method is a placeholder that would be called after canvas rendering.
+   * 
+   * @param pageIndex - The page index to export (0-based)
+   * @param format - Image format ('png' or 'jpeg')
+   * @param quality - JPEG quality (0-1)
+   */
+  async getPageAsImageData(
+    pageIndex: number,
+    format: "png" | "jpeg" = "png",
+    _quality: number = 0.92
+  ): Promise<{ pageIndex: number; format: string }> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pageCount = this.pdfDoc.getPageCount();
+    if (pageIndex < 0 || pageIndex >= pageCount) {
+      throw new Error("Invalid page index");
+    }
+
+    // The actual image export is done via canvas in the component
+    // This method returns metadata for the export
+    return { pageIndex, format };
+  }
+
+  // ========== Compress PDF Methods ==========
+
+  /**
+   * Compresses the PDF by removing duplicate objects and optimizing streams.
+   * Note: pdf-lib has limited compression capabilities.
+   * Full compression would require image resampling and font subsetting.
+   */
+  async compressPDF(): Promise<Uint8Array> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    // Save with object streams for better compression
+    // pdf-lib automatically handles some optimizations
+    return await this.pdfDoc.save({
+      useObjectStreams: true,
+      addDefaultPage: false,
+    });
+  }
+
+  /**
+   * Gets the current PDF size in bytes.
+   */
+  async getPDFSize(): Promise<number> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+    const bytes = await this.pdfDoc.save();
+    return bytes.length;
+  }
+
   reset(): void {
     this.pdfDoc = null;
     this.originalBytes = null;

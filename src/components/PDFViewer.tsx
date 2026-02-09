@@ -13,6 +13,16 @@ import { RedactionCanvas, type Redaction } from "@/components/RedactionTools";
 import WatermarkModal, { type WatermarkConfig } from "@/components/WatermarkModal";
 import HeaderFooterModal, { type HeaderFooterConfig } from "@/components/HeaderFooterModal";
 import PasswordProtectModal, { type PasswordProtectionConfig } from "@/components/PasswordProtectModal";
+// Nice-to-have feature imports
+import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal";
+import StickyNotesCanvas, { type StickyNoteAnnotation, type StickyNoteReply } from "@/components/StickyNotes";
+import LinkAnnotationsCanvas, { type LinkAnnotation } from "@/components/LinkAnnotations";
+import BookmarkEditor, { type BookmarkItem } from "@/components/BookmarkEditor";
+import ExportToImagesModal from "@/components/ExportToImagesModal";
+import CompressPDFModal from "@/components/CompressPDFModal";
+import OCRModal from "@/components/OCRModal";
+import DocumentComparison from "@/components/DocumentComparison";
+import FlattenAnnotationsModal from "@/components/FlattenAnnotationsModal";
 import {
   ChevronLeft,
   ChevronRight,
@@ -36,6 +46,15 @@ import {
   FileText,
   Lock,
   MoreHorizontal,
+  Keyboard,
+  StickyNote,
+  Link,
+  Bookmark,
+  ImageDown,
+  FileArchive,
+  Scan,
+  GitCompare,
+  Stamp,
 } from "lucide-react";
 import type { ImageAnnotation } from "@/services/pdfEditor";
 
@@ -179,6 +198,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
   // Password Protection state
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
+  // Nice-to-have feature states
+  const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
+  const [stickyNotes, setStickyNotes] = useState<StickyNoteAnnotation[]>([]);
+  const [isStickyNotesMode, setIsStickyNotesMode] = useState(false);
+  const [linkAnnotations, setLinkAnnotations] = useState<LinkAnnotation[]>([]);
+  const [isLinkMode, setIsLinkMode] = useState(false);
+  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
+  const [isBookmarkEditorOpen, setIsBookmarkEditorOpen] = useState(false);
+  const [isExportImagesOpen, setIsExportImagesOpen] = useState(false);
+  const [isCompressOpen, setIsCompressOpen] = useState(false);
+  const [isOCROpen, setIsOCROpen] = useState(false);
+  const [isDocCompareOpen, setIsDocCompareOpen] = useState(false);
+  const [isFlattenOpen, setIsFlattenOpen] = useState(false);
+
   // Tools menu state (for mobile)
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
 
@@ -236,12 +269,42 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         setSelectedAnnotationId(null);
         setIsAddingText(false);
         setShowColorPicker(null);
+        setIsStickyNotesMode(false);
+        setIsLinkMode(false);
+      }
+      // ? key: Show keyboard shortcuts
+      if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        setIsKeyboardShortcutsOpen(true);
+      }
+      // Ctrl+F: Open search
+      if ((e.ctrlKey || e.metaKey) && e.key === "f") {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+      // Navigation: Arrow keys for pages
+      if (e.key === "ArrowLeft" && !e.ctrlKey && !e.metaKey && document.activeElement === document.body) {
+        e.preventDefault();
+        setCurrentPage((p) => Math.max(1, p - 1));
+      }
+      if (e.key === "ArrowRight" && !e.ctrlKey && !e.metaKey && document.activeElement === document.body) {
+        e.preventDefault();
+        setCurrentPage((p) => Math.min(numPages, p + 1));
+      }
+      // Zoom: Ctrl+/- 
+      if ((e.ctrlKey || e.metaKey) && (e.key === "=" || e.key === "+")) {
+        e.preventDefault();
+        setScale((s) => Math.min(3, s + 0.25));
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === "-") {
+        e.preventDefault();
+        setScale((s) => Math.max(0.5, s - 0.25));
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleUndo, handleRedo]);
+  }, [handleUndo, handleRedo, numPages]);
 
   useEffect(() => {
     if (!file) return;
@@ -573,6 +636,100 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     console.log("Password protection configured:", config);
     alert(`Password protection configured!\n\nNote: The document will be protected when you save it.\n\nOpen Password: ${config.openPassword.replace(/./g, '*')}`);
   }, []);
+
+  // ========== Nice-to-have Feature Handlers ==========
+
+  // Sticky notes handlers
+  const handleAddStickyNote = useCallback((note: StickyNoteAnnotation) => {
+    saveToHistory("Add sticky note");
+    setStickyNotes((prev) => [...prev, note]);
+  }, [saveToHistory]);
+
+  const handleUpdateStickyNote = useCallback((id: string, updates: Partial<StickyNoteAnnotation>) => {
+    setStickyNotes((prev) =>
+      prev.map((note) => (note.id === id ? { ...note, ...updates } : note))
+    );
+  }, []);
+
+  const handleDeleteStickyNote = useCallback((id: string) => {
+    saveToHistory("Delete sticky note");
+    setStickyNotes((prev) => prev.filter((note) => note.id !== id));
+  }, [saveToHistory]);
+
+  const handleAddStickyNoteReply = useCallback((noteId: string, reply: StickyNoteReply) => {
+    setStickyNotes((prev) =>
+      prev.map((note) =>
+        note.id === noteId
+          ? { ...note, replies: [...note.replies, reply] }
+          : note
+      )
+    );
+  }, []);
+
+  // Link annotations handlers
+  const handleAddLink = useCallback((link: LinkAnnotation) => {
+    saveToHistory("Add link");
+    setLinkAnnotations((prev) => [...prev, link]);
+  }, [saveToHistory]);
+
+  const handleUpdateLink = useCallback((id: string, updates: Partial<LinkAnnotation>) => {
+    setLinkAnnotations((prev) =>
+      prev.map((link) => (link.id === id ? { ...link, ...updates } : link))
+    );
+  }, []);
+
+  const handleDeleteLink = useCallback((id: string) => {
+    saveToHistory("Delete link");
+    setLinkAnnotations((prev) => prev.filter((link) => link.id !== id));
+  }, [saveToHistory]);
+
+  // Export to images handler
+  const handleExportImages = useCallback(async (
+    pages: number[],
+    format: "png" | "jpeg",
+    quality: number,
+    exportScale: number
+  ) => {
+    if (!pdfDocument) return;
+
+    for (let i = 0; i < pages.length; i++) {
+      const pageNum = pages[i];
+      const page = await pdfDocument.getPage(pageNum);
+      const viewport = page.getViewport({ scale: exportScale });
+
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      if (!context) continue;
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      await page.render({
+        canvasContext: context,
+        viewport,
+      }).promise;
+
+      // Convert to blob and download
+      const mimeType = format === "png" ? "image/png" : "image/jpeg";
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `page-${pageNum}.${format}`;
+          link.click();
+          URL.revokeObjectURL(url);
+        },
+        mimeType,
+        quality
+      );
+
+      // Small delay between downloads
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+  }, [pdfDocument]);
 
   const handleApplyChanges = async () => {
     try {
@@ -1280,6 +1437,113 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                     <Lock className="w-4 h-4" />
                     Password Protect
                   </button>
+                  <div className="h-px bg-border my-1" />
+                  {/* Nice-to-have features */}
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsStickyNotesMode(!isStickyNotesMode);
+                      setIsLinkMode(false);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <StickyNote className="w-4 h-4" />
+                    {isStickyNotesMode ? "Exit Sticky Notes" : "Sticky Notes"}
+                    {stickyNotes.filter(n => n.pageNumber === currentPage).length > 0 && (
+                      <span className="ml-auto text-xs bg-amber-500/20 text-amber-600 px-1.5 rounded-full">
+                        {stickyNotes.filter(n => n.pageNumber === currentPage).length}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsLinkMode(!isLinkMode);
+                      setIsStickyNotesMode(false);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Link className="w-4 h-4" />
+                    {isLinkMode ? "Exit Link Mode" : "Add Links"}
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsBookmarkEditorOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    Bookmarks
+                    {bookmarks.length > 0 && (
+                      <span className="ml-auto text-xs bg-primary/20 text-primary px-1.5 rounded-full">
+                        {bookmarks.length}
+                      </span>
+                    )}
+                  </button>
+                  <div className="h-px bg-border my-1" />
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsFlattenOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Stamp className="w-4 h-4" />
+                    Flatten Annotations
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsExportImagesOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <ImageDown className="w-4 h-4" />
+                    Export to Images
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsCompressOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <FileArchive className="w-4 h-4" />
+                    Compress PDF
+                  </button>
+                  <div className="h-px bg-border my-1" />
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsOCROpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Scan className="w-4 h-4" />
+                    OCR Text Recognition
+                  </button>
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsDocCompareOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <GitCompare className="w-4 h-4" />
+                    Compare Documents
+                  </button>
+                  <div className="h-px bg-border my-1" />
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                    onClick={() => {
+                      setIsKeyboardShortcutsOpen(true);
+                      setIsToolsMenuOpen(false);
+                    }}
+                  >
+                    <Keyboard className="w-4 h-4" />
+                    Keyboard Shortcuts
+                  </button>
                   {redactions.filter(r => r.pageNumber === currentPage).length > 0 && (
                     <>
                       <div className="h-px bg-border my-1" />
@@ -1496,6 +1760,31 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             scale={scale}
             isActive={isRedactionMode}
           />
+          {/* Sticky Notes Overlay */}
+          <StickyNotesCanvas
+            notes={stickyNotes}
+            currentPage={currentPage}
+            scale={scale}
+            canvasHeight={canvasSize.height}
+            isActive={isStickyNotesMode}
+            onAddNote={handleAddStickyNote}
+            onUpdateNote={handleUpdateStickyNote}
+            onDeleteNote={handleDeleteStickyNote}
+            onAddReply={handleAddStickyNoteReply}
+          />
+          {/* Link Annotations Overlay */}
+          <LinkAnnotationsCanvas
+            links={linkAnnotations}
+            currentPage={currentPage}
+            totalPages={numPages}
+            scale={scale}
+            canvasHeight={canvasSize.height}
+            isActive={isLinkMode}
+            onAddLink={handleAddLink}
+            onUpdateLink={handleUpdateLink}
+            onDeleteLink={handleDeleteLink}
+            onNavigateToPage={setCurrentPage}
+          />
         </div>
         </div>
       </div>
@@ -1544,6 +1833,57 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
         onApply={handleApplyPasswordProtection}
+      />
+
+      {/* Nice-to-have feature modals */}
+      <KeyboardShortcutsModal
+        isOpen={isKeyboardShortcutsOpen}
+        onClose={() => setIsKeyboardShortcutsOpen(false)}
+      />
+
+      <BookmarkEditor
+        isOpen={isBookmarkEditorOpen}
+        onClose={() => setIsBookmarkEditorOpen(false)}
+        bookmarks={bookmarks}
+        currentPage={currentPage}
+        totalPages={numPages}
+        onBookmarksChange={setBookmarks}
+        onNavigateToPage={setCurrentPage}
+      />
+
+      <ExportToImagesModal
+        isOpen={isExportImagesOpen}
+        onClose={() => setIsExportImagesOpen(false)}
+        pdfDocument={pdfDocument}
+        totalPages={numPages}
+        onExport={handleExportImages}
+      />
+
+      <CompressPDFModal
+        isOpen={isCompressOpen}
+        onClose={() => setIsCompressOpen(false)}
+        fileName={file?.name || "document.pdf"}
+      />
+
+      <OCRModal
+        isOpen={isOCROpen}
+        onClose={() => setIsOCROpen(false)}
+        pdfDocument={pdfDocument}
+        currentPage={currentPage}
+        scale={scale}
+      />
+
+      <DocumentComparison
+        isOpen={isDocCompareOpen}
+        onClose={() => setIsDocCompareOpen(false)}
+        originalFile={file}
+        originalDocument={pdfDocument}
+      />
+
+      <FlattenAnnotationsModal
+        isOpen={isFlattenOpen}
+        onClose={() => setIsFlattenOpen(false)}
+        fileName={file?.name || "document.pdf"}
       />
     </div>
   );

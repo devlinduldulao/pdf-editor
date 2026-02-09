@@ -207,14 +207,14 @@ const HeaderFooterModal: React.FC<HeaderFooterModalProps> = memo(({
    */
   const handleApply = useCallback(() => {
     // Check if at least something is configured
-    const hasHeader =
-      config.header.left.trim() ||
+    const hasHeader = !!
+      (config.header.left.trim() ||
       config.header.center.trim() ||
-      config.header.right.trim();
-    const hasFooter =
-      config.footer.left.trim() ||
+      config.header.right.trim());
+    const hasFooter = !!
+      (config.footer.left.trim() ||
       config.footer.center.trim() ||
-      config.footer.right.trim();
+      config.footer.right.trim());
 
     if (!hasHeader && !hasFooter) {
       alert("Please add at least one header or footer item");
