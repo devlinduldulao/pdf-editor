@@ -264,13 +264,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         e.preventDefault();
         handleRedo();
       }
-      // Escape: Deselect
+      // Escape: Deselect and close menus
       if (e.key === "Escape") {
         setSelectedAnnotationId(null);
         setIsAddingText(false);
         setShowColorPicker(null);
         setIsStickyNotesMode(false);
         setIsLinkMode(false);
+        setIsToolsMenuOpen(false);
       }
       // ? key: Show keyboard shortcuts
       if (e.key === "?" && !e.ctrlKey && !e.metaKey) {
@@ -305,6 +306,29 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleUndo, handleRedo, numPages]);
+
+  // Click-outside handler to close More Tools dropdown
+  useEffect(() => {
+    if (!isToolsMenuOpen) return;
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Check if click is outside the dropdown and button
+      if (!target.closest('[data-tools-menu]')) {
+        setIsToolsMenuOpen(false);
+      }
+    };
+
+    // Add listener with a small delay to avoid immediate close
+    const timeoutId = setTimeout(() => {
+      document.addEventListener('click', handleClickOutside);
+    }, 10);
+
+    return () => {
+      clearTimeout(timeoutId);
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isToolsMenuOpen]);
 
   useEffect(() => {
     if (!file) return;
@@ -1355,10 +1379,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               isActive={isDrawingMode}
               onToggle={toggleDrawingMode}
             />
+          </div>
 
-            {/* More Tools Dropdown */}
-            <div className="relative">
-              <Button
+          {/* More Tools Dropdown - Outside overflow container so dropdown isn't clipped */}
+          <div className="relative shrink-0" data-tools-menu>
+            <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
@@ -1562,7 +1587,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                 </div>
               )}
             </div>
-          </div>
 
           {/* Center: Undo/Redo */}
           <div className="hidden md:flex items-center bg-muted p-0.5 rounded-lg">
