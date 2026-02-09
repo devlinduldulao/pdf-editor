@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { pdfEditorService } from "@/services/pdfEditor";
+import { useHistoryStore, type EditorState } from "@/stores/historyStore";
+import PageThumbnails from "@/components/PageThumbnails";
+import { DrawingToolbar, DrawingCanvas, type DrawingTool, type DrawingPath, type DrawingShape } from "@/components/DrawingTools";
 import {
   ChevronLeft,
   ChevronRight,
@@ -18,6 +21,9 @@ import {
   Italic,
   Plus,
   Minus,
+  Undo2,
+  Redo2,
+  Palette,
 } from "lucide-react";
 import type { ImageAnnotation } from "@/services/pdfEditor";
 
@@ -44,9 +50,20 @@ interface TextAnnotation {
   y: number;
   pageNumber: number;
   fontSize: number;
+  color: string;
   isBold?: boolean;
   isItalic?: boolean;
 }
+
+// Preset colors for text
+const TEXT_COLORS = [
+  { name: "Black", value: "#000000" },
+  { name: "Red", value: "#dc2626" },
+  { name: "Blue", value: "#2563eb" },
+  { name: "Green", value: "#16a34a" },
+  { name: "Purple", value: "#9333ea" },
+  { name: "Orange", value: "#ea580c" },
+];
 
 interface FormFieldComponentProps {
   field: FormField;
@@ -117,10 +134,79 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     string | null
   >(null);
   const [draggingTextId, setDraggingTextId] = useState<string | null>(null);
+  const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
+  const [currentTextColor] = useState<string>("#000000");
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  // Drawing state
+  const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [currentDrawingTool, setCurrentDrawingTool] = useState<DrawingTool>(null);
+  const [drawingColor, setDrawingColor] = useState("#000000");
+  const [drawingStrokeWidth, setDrawingStrokeWidth] = useState(3);
+  const [drawingPaths, setDrawingPaths] = useState<DrawingPath[]>([]);
+  const [drawingShapes, setDrawingShapes] = useState<DrawingShape[]>([]);
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+
+  // History store for undo/redo
+  const { pushState, undo, redo, canUndo, canRedo } = useHistoryStore();
 
   // Defaults for new text
   const defaultFontSize = 12;
+
+  // Save current state to history
+  const saveToHistory = useCallback((action: string) => {
+    const state: EditorState = {
+      textAnnotations: textAnnotations.map(a => ({ ...a, color: a.color || "#000000" })),
+      imageAnnotations: [...imageAnnotations],
+      fieldValues: { ...fieldValues },
+    };
+    pushState(state, action);
+  }, [textAnnotations, imageAnnotations, fieldValues, pushState]);
+
+  // Restore state from history
+  const restoreState = useCallback((state: EditorState | null) => {
+    if (!state) return;
+    setTextAnnotations(state.textAnnotations as TextAnnotation[]);
+    setImageAnnotations(state.imageAnnotations);
+    setFieldValues(state.fieldValues);
+  }, []);
+
+  // Handle undo
+  const handleUndo = useCallback(() => {
+    const previousState = undo();
+    restoreState(previousState);
+  }, [undo, restoreState]);
+
+  // Handle redo
+  const handleRedo = useCallback(() => {
+    const nextState = redo();
+    restoreState(nextState);
+  }, [redo, restoreState]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Undo: Ctrl+Z
+      if ((e.ctrlKey || e.metaKey) && e.key === "z" && !e.shiftKey) {
+        e.preventDefault();
+        handleUndo();
+      }
+      // Redo: Ctrl+Y or Ctrl+Shift+Z
+      if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.key === "z" && e.shiftKey))) {
+        e.preventDefault();
+        handleRedo();
+      }
+      // Escape: Deselect
+      if (e.key === "Escape") {
+        setSelectedAnnotationId(null);
+        setIsAddingText(false);
+        setShowColorPicker(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   useEffect(() => {
     if (!file) return;
@@ -208,6 +294,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           height: initialHeight,
           pageNumber: currentPage,
         };
+        saveToHistory("Add image");
         setImageAnnotations((prev: ImageAnnotation[]) => [
           ...prev,
           newAnnotation,
@@ -291,6 +378,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         };
 
         await page.render(renderContext).promise;
+
+        // Update canvas size for drawing overlay
+        setCanvasSize({ width: viewport.width, height: viewport.height });
       } catch (error) {
         console.error("Error rendering page:", error);
       }
@@ -322,11 +412,65 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     }));
   }, []);
 
+  // Drawing handlers
+  const handleAddDrawingPath = useCallback((path: DrawingPath) => {
+    saveToHistory("Draw path");
+    setDrawingPaths((prev) => [...prev, path]);
+  }, [saveToHistory]);
+
+  const handleAddDrawingShape = useCallback((shape: DrawingShape) => {
+    saveToHistory("Draw shape");
+    setDrawingShapes((prev) => [...prev, shape]);
+  }, [saveToHistory]);
+
+  const handleEraseDrawing = useCallback((x: number, y: number) => {
+    const eraseRadius = 20;
+    
+    // Remove paths that pass near the erase point
+    setDrawingPaths((prev) => prev.filter((path) => {
+      if (path.pageNumber !== currentPage) return true;
+      return !path.points.some((p) => {
+        const dist = Math.sqrt(Math.pow(p.x - x, 2) + Math.pow(p.y - y, 2));
+        return dist < eraseRadius;
+      });
+    }));
+
+    // Remove shapes that are near the erase point
+    setDrawingShapes((prev) => prev.filter((shape) => {
+      if (shape.pageNumber !== currentPage) return true;
+      const centerX = (shape.startX + shape.endX) / 2;
+      const centerY = (shape.startY + shape.endY) / 2;
+      const dist = Math.sqrt(Math.pow(centerX - x, 2) + Math.pow(centerY - y, 2));
+      return dist >= eraseRadius;
+    }));
+  }, [currentPage]);
+
+  const handleClearDrawings = useCallback(() => {
+    if (!confirm("Clear all drawings on this page?")) return;
+    saveToHistory("Clear drawings");
+    setDrawingPaths((prev) => prev.filter((p) => p.pageNumber !== currentPage));
+    setDrawingShapes((prev) => prev.filter((s) => s.pageNumber !== currentPage));
+  }, [currentPage, saveToHistory]);
+
+  const toggleDrawingMode = useCallback(() => {
+    setIsDrawingMode((prev) => {
+      if (!prev) {
+        setIsAddingText(false);
+        setCurrentDrawingTool("pen");
+      } else {
+        setCurrentDrawingTool(null);
+      }
+      return !prev;
+    });
+  }, []);
+
   const handleApplyChanges = async () => {
     try {
       console.log("Applying changes...");
       console.log("Form fields:", fieldValues);
       console.log("Text annotations:", textAnnotations);
+      console.log("Drawing paths:", drawingPaths.length);
+      console.log("Drawing shapes:", drawingShapes.length);
 
       // Fill form fields using pdf-lib
       for (const [fieldName, value] of Object.entries(fieldValues)) {
@@ -350,8 +494,29 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         await pdfEditorService.addImage(annotation);
       }
 
+      // Add drawing paths
+      for (const path of drawingPaths) {
+        if (path.tool === "pen" || path.tool === "highlighter") {
+          await pdfEditorService.addDrawingPath({
+            id: path.id,
+            tool: path.tool,
+            points: path.points,
+            color: path.color,
+            strokeWidth: path.strokeWidth,
+            opacity: path.opacity,
+            pageNumber: path.pageNumber,
+          });
+        }
+      }
+
+      // Add drawing shapes
+      for (const shape of drawingShapes) {
+        await pdfEditorService.addDrawingShape(shape);
+      }
+
+      const totalItems = validAnnotations.length + imageAnnotations.length + drawingPaths.length + drawingShapes.length;
       alert(
-        `Changes applied! ${validAnnotations.length} text(s) and ${imageAnnotations.length} image(s) added. Click Save to download.`,
+        `Changes applied! ${totalItems} item(s) added. Click Save to download.`,
       );
     } catch (error: any) {
       console.error("Error applying changes:", error);
@@ -379,10 +544,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         y: pdfY,
         pageNumber: currentPage,
         fontSize: defaultFontSize,
+        color: currentTextColor,
         isBold: false,
         isItalic: false,
       };
 
+      saveToHistory("Add text");
       setTextAnnotations((prev) => [...prev, newAnnotation]);
       setSelectedAnnotationId(newAnnotation.id);
       setIsAddingText(false); // Switch to edit mode immediately
@@ -431,6 +598,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           height: initialHeight,
           pageNumber: currentPage,
         };
+        saveToHistory("Add image");
         setImageAnnotations((prev: ImageAnnotation[]) => [
           ...prev,
           newAnnotation,
@@ -457,8 +625,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
   );
 
   const handleDeleteAnnotation = useCallback((id: string) => {
+    saveToHistory("Delete text");
     setTextAnnotations((prev) => prev.filter((ann) => ann.id !== id));
-  }, []);
+  }, [saveToHistory]);
 
   const getFieldPosition = useCallback(
     (field: FormField) => {
@@ -602,12 +771,55 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               <Italic className="w-4 h-4" />
             </Button>
             <div className="w-px h-4 bg-border mx-1" />
+            {/* Color Picker */}
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowColorPicker(showColorPicker === annotation.id ? null : annotation.id);
+                }}
+                title="Text Color"
+              >
+                <div className="relative">
+                  <Palette className="w-4 h-4" />
+                  <div
+                    className="absolute -bottom-0.5 left-0 right-0 h-1 rounded-full"
+                    style={{ backgroundColor: annotation.color || "#000000" }}
+                  />
+                </div>
+              </Button>
+              {showColorPicker === annotation.id && (
+                <div className="absolute top-full left-0 mt-1 p-2 bg-popover border border-border rounded-lg shadow-xl z-50 flex gap-1">
+                  {TEXT_COLORS.map((color) => (
+                    <button
+                      key={color.value}
+                      className={`w-6 h-6 rounded-full border-2 hover:scale-110 transition-transform ${
+                        (annotation.color || "#000000") === color.value ? "border-primary ring-2 ring-primary/30" : "border-transparent"
+                      }`}
+                      style={{ backgroundColor: color.value }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        saveToHistory("Change color");
+                        updateAnnotationStyle(annotation.id, { color: color.value });
+                        setShowColorPicker(null);
+                      }}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="w-px h-4 bg-border mx-1" />
             <Button
               variant="ghost"
               size="icon"
               className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={(e) => {
                 e.stopPropagation();
+                saveToHistory("Change font size");
                 updateAnnotationStyle(annotation.id, {
                   fontSize: Math.max(8, (annotation.fontSize || 12) - 2),
                 });
@@ -625,6 +837,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               className="h-8 w-8 text-muted-foreground hover:bg-muted hover:text-foreground"
               onClick={(e) => {
                 e.stopPropagation();
+                saveToHistory("Change font size");
                 updateAnnotationStyle(annotation.id, {
                   fontSize: Math.min(72, (annotation.fontSize || 12) + 2),
                 });
@@ -656,6 +869,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             fontSize: `${annotation.fontSize}px`,
             fontWeight: annotation.isBold ? "bold" : "normal",
             fontStyle: annotation.isItalic ? "italic" : "normal",
+            color: annotation.color || "#000000",
             border: isSelected ? "1px dashed #6366f1" : "1px solid transparent",
             background: isSelected ? "rgba(255, 255, 255, 0.9)" : "transparent",
             minWidth: "150px",
@@ -854,6 +1068,49 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
 
           <div className="h-6 w-px bg-border mx-1 hidden md:block" />
 
+          {/* Drawing Tools */}
+          <DrawingToolbar
+            currentTool={currentDrawingTool}
+            onToolChange={setCurrentDrawingTool}
+            currentColor={drawingColor}
+            onColorChange={setDrawingColor}
+            strokeWidth={drawingStrokeWidth}
+            onStrokeWidthChange={setDrawingStrokeWidth}
+            onClear={handleClearDrawings}
+            isActive={isDrawingMode}
+            onToggle={toggleDrawingMode}
+          />
+
+          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
+
+          {/* Undo/Redo buttons */}
+          <div className="flex items-center bg-muted p-1 rounded-lg shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleUndo}
+              disabled={!canUndo()}
+              className="h-8 px-2 gap-1 border-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
+              title="Undo (Ctrl+Z)"
+            >
+              <Undo2 className="w-4 h-4" />
+              <span className="text-xs hidden lg:inline">Undo</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRedo}
+              disabled={!canRedo()}
+              className="h-8 px-2 gap-1 border-0 text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-30"
+              title="Redo (Ctrl+Y)"
+            >
+              <Redo2 className="w-4 h-4" />
+              <span className="text-xs hidden lg:inline">Redo</span>
+            </Button>
+          </div>
+
+          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
+
           <Button
             onClick={handleApplyChanges}
             size="sm"
@@ -918,8 +1175,21 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         </div>
       </div>
 
-      {/* Main Canvas Area */}
-      <div className="flex-1 overflow-auto flex justify-center items-start p-2 md:p-8 relative bg-muted/50">
+      {/* Main Content Area with Thumbnails Sidebar */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Page Thumbnails Sidebar */}
+        <PageThumbnails
+          file={file}
+          currentPage={currentPage}
+          onPageSelect={setCurrentPage}
+          onPagesChanged={() => {
+            // Trigger re-render of the current page
+            setNumPages(pdfEditorService.getPageCount());
+          }}
+        />
+
+        {/* Main Canvas Area */}
+        <div className="flex-1 overflow-auto flex justify-center items-start p-2 md:p-8 relative bg-muted/50">
 
         <div className="relative shadow-xl ring-1 ring-black/5 transition-transform duration-200 ease-in-out group">
           <div
@@ -929,7 +1199,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           <div
             ref={overlayRef}
             data-testid="pdf-overlay"
-            className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""}`}
+            className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""} ${isDrawingMode ? "pointer-events-none" : ""}`}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             onClick={handleCanvasClick}
@@ -944,6 +1214,24 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               )}
             </div>
           </div>
+          {/* Drawing Canvas Overlay */}
+          {isDrawingMode && canvasSize.width > 0 && (
+            <DrawingCanvas
+              width={canvasSize.width}
+              height={canvasSize.height}
+              currentTool={currentDrawingTool}
+              currentColor={drawingColor}
+              strokeWidth={drawingStrokeWidth}
+              paths={drawingPaths}
+              shapes={drawingShapes}
+              onAddPath={handleAddDrawingPath}
+              onAddShape={handleAddDrawingShape}
+              onErase={handleEraseDrawing}
+              pageNumber={currentPage}
+              scale={scale}
+            />
+          )}
+        </div>
         </div>
       </div>
 
