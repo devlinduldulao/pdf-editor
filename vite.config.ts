@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -53,6 +54,24 @@ export default defineConfig(({mode}) =>{
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./src/testing/setup.ts"],
+    include: ["src/**/*.test.{ts,tsx}"],
+    css: false,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "html", "clover", "json"],
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/main.tsx",
+        "src/vite-env.d.ts",
+        "src/testing/**",
+        "src/**/*.test.{ts,tsx}",
+      ],
     },
   },
   }
