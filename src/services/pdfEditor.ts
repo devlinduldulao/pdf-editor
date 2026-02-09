@@ -457,6 +457,299 @@ export class PDFEditorService {
     };
   }
 
+  // ========== Redaction Methods ==========
+
+  /**
+   * Applies redaction boxes to the PDF.
+   * Redaction boxes are solid black rectangles that permanently cover sensitive content.
+   * 
+   * @param redactions - Array of redaction areas with page numbers and coordinates
+   */
+  async applyRedactions(redactions: Array<{
+    pageNumber: number;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+
+    for (const redaction of redactions) {
+      const page = pages[redaction.pageNumber - 1];
+      if (!page) continue;
+
+      const pageHeight = page.getHeight();
+
+      // Draw a solid black rectangle to cover the content
+      // Convert from screen coordinates (origin top-left) to PDF coordinates (origin bottom-left)
+      page.drawRectangle({
+        x: redaction.x,
+        y: pageHeight - redaction.y - redaction.height,
+        width: redaction.width,
+        height: redaction.height,
+        color: rgb(0, 0, 0), // Solid black
+        borderWidth: 0,
+      });
+    }
+  }
+
+  // ========== Watermark Methods ==========
+
+  /**
+   * Adds a text or image watermark to all pages.
+   * 
+   * @param config - Watermark configuration including type, content, opacity, position, and rotation
+   */
+  async addWatermark(config: {
+    type: "text" | "image";
+    text: string;
+    imageData: string | null;
+    fontSize: number;
+    opacity: number;
+    rotation: number;
+    position: string;
+    color: string;
+  }): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+
+    for (const page of pages) {
+      const { width, height } = page.getSize();
+
+      // Calculate position based on position string
+      const pos = this.calculateWatermarkPosition(config.position, width, height, config.fontSize);
+
+      if (config.type === "text" && config.text) {
+        const font = await this.pdfDoc.embedFont(StandardFonts.HelveticaBold);
+        const textWidth = font.widthOfTextAtSize(config.text, config.fontSize);
+        const textHeight = config.fontSize;
+
+        // Adjust position to center the text at the calculated point
+        const x = pos.x - textWidth / 2;
+        const y = pos.y - textHeight / 2;
+
+        const textColor = hexToRgb(config.color);
+
+        page.drawText(config.text, {
+          x,
+          y,
+          size: config.fontSize,
+          font,
+          color: rgb(textColor.r, textColor.g, textColor.b),
+          opacity: config.opacity / 100,
+          rotate: degrees(config.rotation),
+        });
+      } else if (config.type === "image" && config.imageData) {
+        try {
+          const imageDataPart = config.imageData.split(",")[1];
+          const imageBytes = Uint8Array.from(atob(imageDataPart), (c) =>
+            c.charCodeAt(0)
+          );
+
+          let embeddedImage;
+          if (config.imageData.includes("image/png")) {
+            embeddedImage = await this.pdfDoc.embedPng(imageBytes);
+          } else {
+            embeddedImage = await this.pdfDoc.embedJpg(imageBytes);
+          }
+
+          // Scale image to fit reasonably on the page
+          const imgWidth = Math.min(embeddedImage.width, width * 0.3);
+          const imgHeight = imgWidth * (embeddedImage.height / embeddedImage.width);
+
+          const x = pos.x - imgWidth / 2;
+          const y = pos.y - imgHeight / 2;
+
+          page.drawImage(embeddedImage, {
+            x,
+            y,
+            width: imgWidth,
+            height: imgHeight,
+            opacity: config.opacity / 100,
+            rotate: degrees(config.rotation),
+          });
+        } catch (error) {
+          console.error("Error adding watermark image:", error);
+        }
+      }
+    }
+  }
+
+  /**
+   * Calculates the x,y position for a watermark based on the position string.
+   */
+  private calculateWatermarkPosition(
+    position: string,
+    pageWidth: number,
+    pageHeight: number,
+    fontSize: number
+  ): { x: number; y: number } {
+    const margin = 50;
+    let x = pageWidth / 2;
+    let y = pageHeight / 2;
+
+    if (position.includes("left")) x = margin + fontSize;
+    if (position.includes("right")) x = pageWidth - margin - fontSize;
+    if (position.includes("top")) y = pageHeight - margin - fontSize;
+    if (position.includes("bottom")) y = margin + fontSize;
+
+    return { x, y };
+  }
+
+  // ========== Header/Footer Methods ==========
+
+  /**
+   * Adds headers and/or footers to all pages.
+   * 
+   * @param config - Header/footer configuration
+   */
+  async addHeaderFooter(config: {
+    header: {
+      left: string;
+      center: string;
+      right: string;
+      enabled: boolean;
+    };
+    footer: {
+      left: string;
+      center: string;
+      right: string;
+      enabled: boolean;
+    };
+    pageNumberFormat: string;
+    dateFormat: string;
+    fontSize: number;
+    margin: number;
+  }): Promise<void> {
+    if (!this.pdfDoc) throw new Error("No PDF loaded");
+
+    const pages = this.pdfDoc.getPages();
+    const totalPages = pages.length;
+    const font = await this.pdfDoc.embedFont(StandardFonts.Helvetica);
+
+    for (let i = 0; i < pages.length; i++) {
+      const page = pages[i];
+      const { width, height } = page.getSize();
+      const pageNum = i + 1;
+
+      // Format text by replacing tokens
+      const formatText = (text: string): string => {
+        let result = text;
+        result = result.replace(/\{page\}/g, pageNum.toString());
+        result = result.replace(/\{total\}/g, totalPages.toString());
+        result = result.replace(/\{date\}/g, this.formatDate(config.dateFormat));
+        return result;
+      };
+
+      // Draw header
+      if (config.header.enabled) {
+        const headerY = height - config.margin;
+
+        // Left
+        if (config.header.left) {
+          page.drawText(formatText(config.header.left), {
+            x: config.margin,
+            y: headerY,
+            size: config.fontSize,
+            font,
+            color: rgb(0.3, 0.3, 0.3),
+          });
+        }
+
+        // Center
+        if (config.header.center) {
+          const text = formatText(config.header.center);
+          const textWidth = font.widthOfTextAtSize(text, config.fontSize);
+          page.drawText(text, {
+            x: (width - textWidth) / 2,
+            y: headerY,
+            size: config.fontSize,
+            font,
+            color: rgb(0.3, 0.3, 0.3),
+          });
+        }
+
+        // Right
+        if (config.header.right) {
+          const text = formatText(config.header.right);
+          const textWidth = font.widthOfTextAtSize(text, config.fontSize);
+          page.drawText(text, {
+            x: width - config.margin - textWidth,
+            y: headerY,
+            size: config.fontSize,
+            font,
+            color: rgb(0.3, 0.3, 0.3),
+          });
+        }
+      }
+
+      // Draw footer
+      if (config.footer.enabled) {
+        const footerY = config.margin;
+
+        // Left
+        if (config.footer.left) {
+          page.drawText(formatText(config.footer.left), {
+            x: config.margin,
+            y: footerY,
+            size: config.fontSize,
+            font,
+            color: rgb(0.3, 0.3, 0.3),
+          });
+        }
+
+        // Center
+        if (config.footer.center) {
+          const text = formatText(config.footer.center);
+          const textWidth = font.widthOfTextAtSize(text, config.fontSize);
+          page.drawText(text, {
+            x: (width - textWidth) / 2,
+            y: footerY,
+            size: config.fontSize,
+            font,
+            color: rgb(0.3, 0.3, 0.3),
+          });
+        }
+
+        // Right
+        if (config.footer.right) {
+          const text = formatText(config.footer.right);
+          const textWidth = font.widthOfTextAtSize(text, config.fontSize);
+          page.drawText(text, {
+            x: width - config.margin - textWidth,
+            y: footerY,
+            size: config.fontSize,
+            font,
+            color: rgb(0.3, 0.3, 0.3),
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Formats the current date according to the specified format.
+   */
+  private formatDate(format: string): string {
+    const now = new Date();
+
+    switch (format) {
+      case "short":
+        return now.toLocaleDateString("en-US");
+      case "medium":
+        return now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      case "long":
+        return now.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      case "iso":
+        return now.toISOString().split("T")[0];
+      default:
+        return now.toLocaleDateString("en-US");
+    }
+  }
+
   reset(): void {
     this.pdfDoc = null;
     this.originalBytes = null;

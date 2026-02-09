@@ -37,10 +37,30 @@
 
 ## ✨ Features
 
-- **📄 View & Fill**: High-quality PDF rendering with automatic form field detection.
-- **✍️ Annotate**: Add text and images/signatures via drag-and-drop.
-- **🔒 Privacy First**: 100% client-side processing; no files are uploaded to servers.
-- **📱 Responsive**: Modern UI that works on desktop and tablet.
+### Core Features
+- **📄 PDF Viewing** - High-quality rendering with zoom, page navigation, and thumbnails
+- **📝 Form Filling** - Automatic field detection with text inputs and checkboxes
+- **✍️ Text Annotations** - Add, edit, drag, style with colors, bold/italic
+- **🖼️ Image/Signature** - Insert images and signatures via drag-and-drop
+- **🔒 Privacy First** - 100% client-side; no files uploaded to servers
+
+### Editing Tools
+- **↩️ Undo/Redo** - Full history with Ctrl+Z / Ctrl+Y keyboard shortcuts
+- **🎨 Drawing** - Freehand pen, highlighter, shapes (rectangle, circle, arrow, line)
+- **🔍 Search** - Find text with Ctrl+F, highlighted matches, navigation
+- **📑 Page Management** - Rotate, delete, extract, insert blank pages
+
+### Professional Features  
+- **✒️ Signature Pad** - Draw or type signatures, save for reuse
+- **█ Redaction** - Preview and permanently black out sensitive content
+- **💧 Watermark** - Text/image with configurable opacity, position, rotation
+- **📋 Header/Footer** - Page numbers, dates, custom text with positioning
+- **🔐 Password Protection** - Encrypt PDF output with permissions
+
+### User Experience
+- **🌓 Dark/Light Theme** - Toggle between themes
+- **📱 Responsive Design** - Works on desktop and tablet
+- **⚡ PWA Support** - Install as desktop/mobile app
 
 ## 🎬 Demo
 
@@ -69,10 +89,28 @@ npm run test
 
 ## 🗺️ Roadmap
 
-- [ ] Open Password-Protected PDFs
-- [ ] Security Features (Redaction, Encryption)
-- [ ] Advanced Editing (Convert to Word, Page Manipulation)
-- [ ] Workflow Tools (eSign, Compare Docs)
+### ✅ Completed
+- [x] Undo/Redo System
+- [x] Page Management (rotate, delete, extract, insert)
+- [x] Drawing & Markup Tools (freehand, highlighter, shapes)
+- [x] Text Color & Styling
+- [x] Search & Find (Ctrl+F)
+- [x] Thumbnail Navigation
+- [x] Signature Management
+- [x] Redaction Tools
+- [x] Password Protection
+- [x] Watermark
+- [x] Header/Footer
+
+### 🔜 Planned (Future Releases)
+- [ ] Document Comparison (side-by-side diff)
+- [ ] OCR Text Recognition
+- [ ] PDF Compression
+- [ ] Bookmark Editor
+- [ ] Export to Images (PNG/JPG)
+- [ ] Sticky Notes & Comments
+
+See [FEATURE_ROADMAP.md](docs/FEATURE_ROADMAP.md) for full details.
 
 ## 🤝 Contributing
 

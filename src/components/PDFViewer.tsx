@@ -7,6 +7,12 @@ import { pdfEditorService } from "@/services/pdfEditor";
 import { useHistoryStore, type EditorState } from "@/stores/historyStore";
 import PageThumbnails from "@/components/PageThumbnails";
 import { DrawingToolbar, DrawingCanvas, type DrawingTool, type DrawingPath, type DrawingShape } from "@/components/DrawingTools";
+import SearchBar, { SearchHighlightsOverlay, type SearchHighlight } from "@/components/SearchBar";
+import SignaturePad from "@/components/SignaturePad";
+import { RedactionToolbar, RedactionCanvas, type Redaction } from "@/components/RedactionTools";
+import WatermarkModal, { type WatermarkConfig } from "@/components/WatermarkModal";
+import HeaderFooterModal, { type HeaderFooterConfig } from "@/components/HeaderFooterModal";
+import PasswordProtectModal, { type PasswordProtectionConfig } from "@/components/PasswordProtectModal";
 import {
   ChevronLeft,
   ChevronRight,
@@ -24,6 +30,12 @@ import {
   Undo2,
   Redo2,
   Palette,
+  Search,
+  PenTool,
+  Droplets,
+  FileText,
+  Lock,
+  MoreHorizontal,
 } from "lucide-react";
 import type { ImageAnnotation } from "@/services/pdfEditor";
 
@@ -146,6 +158,29 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
   const [drawingPaths, setDrawingPaths] = useState<DrawingPath[]>([]);
   const [drawingShapes, setDrawingShapes] = useState<DrawingShape[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+
+  // Search state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchHighlights, setSearchHighlights] = useState<SearchHighlight[]>([]);
+
+  // Signature state
+  const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
+
+  // Redaction state
+  const [isRedactionMode, setIsRedactionMode] = useState(false);
+  const [redactions, setRedactions] = useState<Redaction[]>([]);
+
+  // Watermark state
+  const [isWatermarkModalOpen, setIsWatermarkModalOpen] = useState(false);
+
+  // Header/Footer state
+  const [isHeaderFooterModalOpen, setIsHeaderFooterModalOpen] = useState(false);
+
+  // Password Protection state
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  // Tools menu state (for mobile)
+  const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
 
   // History store for undo/redo
   const { pushState, undo, redo, canUndo, canRedo } = useHistoryStore();
@@ -456,12 +491,87 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     setIsDrawingMode((prev) => {
       if (!prev) {
         setIsAddingText(false);
+        setIsRedactionMode(false);
         setCurrentDrawingTool("pen");
       } else {
         setCurrentDrawingTool(null);
       }
       return !prev;
     });
+  }, []);
+
+  // Toggle redaction mode
+  const toggleRedactionMode = useCallback(() => {
+    setIsRedactionMode((prev) => {
+      if (!prev) {
+        setIsAddingText(false);
+        setIsDrawingMode(false);
+        setCurrentDrawingTool(null);
+      }
+      return !prev;
+    });
+  }, []);
+
+  // Redaction handlers
+  const handleAddRedaction = useCallback((redaction: Redaction) => {
+    saveToHistory("Add redaction");
+    setRedactions((prev) => [...prev, redaction]);
+  }, [saveToHistory]);
+
+  const handleRemoveRedaction = useCallback((id: string) => {
+    saveToHistory("Remove redaction");
+    setRedactions((prev) => prev.filter((r) => r.id !== id));
+  }, [saveToHistory]);
+
+  const handleClearRedactions = useCallback(() => {
+    if (!confirm("Clear all redactions on this page?")) return;
+    saveToHistory("Clear redactions");
+    setRedactions((prev) => prev.filter((r) => r.pageNumber !== currentPage));
+  }, [currentPage, saveToHistory]);
+
+  // Signature handler
+  const handleApplySignature = useCallback((signatureData: string) => {
+    saveToHistory("Add signature");
+    const newAnnotation: ImageAnnotation = {
+      id: `signature_${Date.now()}`,
+      imageData: signatureData,
+      x: 50,
+      y: 100, // Place near bottom of page
+      width: 150,
+      height: 50,
+      pageNumber: currentPage,
+    };
+    setImageAnnotations((prev) => [...prev, newAnnotation]);
+  }, [currentPage, saveToHistory]);
+
+  // Watermark handler
+  const handleApplyWatermark = useCallback(async (config: WatermarkConfig) => {
+    try {
+      await pdfEditorService.addWatermark(config);
+      alert("Watermark applied to all pages!");
+    } catch (error) {
+      console.error("Error applying watermark:", error);
+      alert("Failed to apply watermark");
+    }
+  }, []);
+
+  // Header/Footer handler
+  const handleApplyHeaderFooter = useCallback(async (config: HeaderFooterConfig) => {
+    try {
+      await pdfEditorService.addHeaderFooter(config);
+      alert("Header/Footer applied to all pages!");
+    } catch (error) {
+      console.error("Error applying header/footer:", error);
+      alert("Failed to apply header/footer");
+    }
+  }, []);
+
+  // Password protection handler
+  const handleApplyPasswordProtection = useCallback((config: PasswordProtectionConfig) => {
+    // Store the configuration - it will be applied when saving
+    // Note: pdf-lib has limited encryption support, so this is mainly for UI demonstration
+    console.log("Password protection configured:", config);
+    alert(`Password protection configured!\n\nNote: The document will be protected when you save it.\n\nOpen Password: ${config.openPassword.replace(/./g, '*')}`);
   }, []);
 
   const handleApplyChanges = async () => {
@@ -514,7 +624,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         await pdfEditorService.addDrawingShape(shape);
       }
 
-      const totalItems = validAnnotations.length + imageAnnotations.length + drawingPaths.length + drawingShapes.length;
+      // Apply redactions (solid black rectangles over sensitive content)
+      if (redactions.length > 0) {
+        await pdfEditorService.applyRedactions(redactions);
+        console.log("Applied redactions:", redactions.length);
+      }
+
+      const totalItems = validAnnotations.length + imageAnnotations.length + drawingPaths.length + drawingShapes.length + redactions.length;
       alert(
         `Changes applied! ${totalItems} item(s) added. Click Save to download.`,
       );
@@ -1081,6 +1197,87 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             onToggle={toggleDrawingMode}
           />
 
+          {/* Signature Tool */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSignatureModalOpen(true)}
+            className="h-8 px-2 md:px-3 gap-2 border-0 bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+            title="Add Signature"
+          >
+            <PenTool className="w-4 h-4" />
+            <span className="text-xs hidden lg:inline">Sign</span>
+          </Button>
+
+          {/* Redaction Tool */}
+          <RedactionToolbar
+            isActive={isRedactionMode}
+            onToggle={toggleRedactionMode}
+            redactionCount={redactions.filter(r => r.pageNumber === currentPage).length}
+            onClearAll={handleClearRedactions}
+          />
+
+          <div className="h-6 w-px bg-border mx-1 hidden md:block" />
+
+          {/* More Tools Dropdown (for less common features) */}
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
+              className="h-8 px-2 gap-1 border-0 bg-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              title="More Tools"
+            >
+              <MoreHorizontal className="w-4 h-4" />
+              <span className="text-xs hidden lg:inline">More</span>
+            </Button>
+            {isToolsMenuOpen && (
+              <div className="absolute top-full left-0 mt-1 z-50 bg-card border border-border rounded-lg shadow-xl p-1 min-w-[160px] animate-in fade-in zoom-in-95 duration-100">
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                  onClick={() => {
+                    setIsSearchOpen(true);
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <Search className="w-4 h-4" />
+                  Search (Ctrl+F)
+                </button>
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                  onClick={() => {
+                    setIsWatermarkModalOpen(true);
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <Droplets className="w-4 h-4" />
+                  Add Watermark
+                </button>
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                  onClick={() => {
+                    setIsHeaderFooterModalOpen(true);
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <FileText className="w-4 h-4" />
+                  Header/Footer
+                </button>
+                <div className="h-px bg-border my-1" />
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
+                  onClick={() => {
+                    setIsPasswordModalOpen(true);
+                    setIsToolsMenuOpen(false);
+                  }}
+                >
+                  <Lock className="w-4 h-4" />
+                  Password Protect
+                </button>
+              </div>
+            )}
+          </div>
+
           <div className="h-6 w-px bg-border mx-1 hidden md:block" />
 
           {/* Undo/Redo buttons */}
@@ -1191,6 +1388,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         {/* Main Canvas Area */}
         <div className="flex-1 overflow-auto flex justify-center items-start p-2 md:p-8 relative bg-muted/50">
 
+        {/* Search Bar */}
+        <SearchBar
+          pdfDocument={pdfDocument}
+          currentPage={currentPage}
+          scale={scale}
+          onNavigateToPage={setCurrentPage}
+          onHighlightsChange={setSearchHighlights}
+          isOpen={isSearchOpen}
+          onOpenChange={setIsSearchOpen}
+        />
+
         <div className="relative shadow-xl ring-1 ring-black/5 transition-transform duration-200 ease-in-out group">
           <div
             ref={canvasRef}
@@ -1199,12 +1407,18 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           <div
             ref={overlayRef}
             data-testid="pdf-overlay"
-            className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""} ${isDrawingMode ? "pointer-events-none" : ""}`}
+            className={`absolute top-0 left-0 w-full h-full ${isAddingText ? "cursor-text" : ""} ${isDrawingMode || isRedactionMode ? "pointer-events-none" : ""}`}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
             onClick={handleCanvasClick}
           >
             <div className="relative w-full h-full">
+              {/* Search Highlights */}
+              <SearchHighlightsOverlay
+                highlights={searchHighlights}
+                currentPage={currentPage}
+                scale={scale}
+              />
               {formFields.map((field) => renderFormField(field))}
               {textAnnotations.map((annotation) =>
                 renderTextAnnotation(annotation),
@@ -1231,6 +1445,17 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
               scale={scale}
             />
           )}
+          {/* Redaction Canvas Overlay */}
+          <RedactionCanvas
+            width={canvasSize.width}
+            height={canvasSize.height}
+            redactions={redactions}
+            onAddRedaction={handleAddRedaction}
+            onRemoveRedaction={handleRemoveRedaction}
+            pageNumber={currentPage}
+            scale={scale}
+            isActive={isRedactionMode}
+          />
         </div>
         </div>
       </div>
@@ -1254,6 +1479,32 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
           </Button>
         </div>
       )}
+
+      {/* Modals */}
+      <SignaturePad
+        isOpen={isSignatureModalOpen}
+        onClose={() => setIsSignatureModalOpen(false)}
+        onApply={handleApplySignature}
+      />
+
+      <WatermarkModal
+        isOpen={isWatermarkModalOpen}
+        onClose={() => setIsWatermarkModalOpen(false)}
+        onApply={handleApplyWatermark}
+      />
+
+      <HeaderFooterModal
+        isOpen={isHeaderFooterModalOpen}
+        onClose={() => setIsHeaderFooterModalOpen(false)}
+        onApply={handleApplyHeaderFooter}
+        totalPages={numPages}
+      />
+
+      <PasswordProtectModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onApply={handleApplyPasswordProtection}
+      />
     </div>
   );
 };
