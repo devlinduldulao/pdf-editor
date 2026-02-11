@@ -242,7 +242,7 @@ describe("App", () => {
       });
 
       // Click New
-      await user.click(screen.getByTitle("New"));
+      await user.click(screen.getByTitle("New document"));
 
       expect(window.confirm).toHaveBeenCalled();
       expect(pdfEditorService.reset).toHaveBeenCalled();
@@ -268,7 +268,7 @@ describe("App", () => {
       });
 
       // Click Save
-      await user.click(screen.getByTitle("Save"));
+      await user.click(screen.getByTitle("Save (download)"));
 
       await waitFor(() => {
         expect(pdfEditorService.downloadPDF).toHaveBeenCalledWith("report.pdf");

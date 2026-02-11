@@ -3,11 +3,9 @@ import { Button } from "@/components/ui/button";
 import {
   FilePlus,
   Save,
-  LayoutTemplate,
-  Share,
-  Github,
-  Bug,
+  FileDown,
   Printer,
+  FileText,
 } from "lucide-react";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 
@@ -22,91 +20,79 @@ interface MenuBarProps {
 const MenuBar: React.FC<MenuBarProps> = memo(
   ({ onSave, onSaveAs, onNew, onPrint, hasDocument }) => {
     return (
-      <header className="flex justify-between items-center px-4 md:px-6 py-3 bg-card text-card-foreground border-b border-border h-16 shrink-0 z-50">
-        <div className="flex items-center gap-2">
-          <LayoutTemplate className="w-5 h-5 text-primary" />
-          <h1 className="text-lg font-semibold tracking-wide hidden sm:block">
+      <header
+        className="flex justify-between items-center px-3 md:px-5 py-2 bg-card text-card-foreground border-b border-border h-14 shrink-0 z-50"
+        role="banner"
+      >
+        {/* Brand */}
+        <div className="flex items-center gap-2.5 select-none">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
+            <FileText className="w-4 h-4 text-primary" />
+          </div>
+          <span className="text-base font-bold tracking-tight hidden sm:block">
             PDF<span className="text-primary">Editor</span>
-          </h1>
-          <h1 className="text-lg font-semibold tracking-wide sm:hidden">
-            PDF<span className="text-primary">E</span>
-          </h1>
+          </span>
         </div>
 
-        <div className="flex items-center gap-1 md:gap-2">
-          <Button variant="ghost" size="sm" onClick={onNew} title="New">
+        {/* Actions */}
+        <nav className="flex items-center gap-0.5 md:gap-1" aria-label="File actions">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onNew}
+            title="New document"
+            aria-label="New document"
+            className="h-8 px-2.5 gap-1.5 text-muted-foreground hover:text-foreground"
+          >
             <FilePlus className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">New</span>
+            <span className="hidden sm:inline text-xs font-medium">New</span>
           </Button>
 
-          <div className="w-px h-6 bg-border mx-1 md:mx-2" />
+          <div className="w-px h-5 bg-border mx-0.5 md:mx-1.5" aria-hidden="true" />
 
           <Button
             variant="ghost"
             size="sm"
             onClick={onSave}
             disabled={!hasDocument}
-            title="Save"
+            title="Save (download)"
+            aria-label="Save document"
+            className="h-8 px-2.5 gap-1.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
           >
             <Save className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">Save</span>
+            <span className="hidden sm:inline text-xs font-medium">Save</span>
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onPrint}
-            disabled={!hasDocument}
-            title="Print PDF"
-          >
-            <Printer className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">Print</span>
-          </Button>
+
           <Button
             variant="ghost"
             size="sm"
             onClick={onSaveAs}
             disabled={!hasDocument}
-            title="Export"
+            title="Export as..."
+            aria-label="Export document"
+            className="h-8 px-2.5 gap-1.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
           >
-            <Share className="w-4 h-4" />
-            <span className="hidden sm:inline ml-2">Export</span>
+            <FileDown className="w-4 h-4" />
+            <span className="hidden md:inline text-xs font-medium">Export</span>
           </Button>
 
-          <div className="w-px h-6 bg-border mx-1 md:mx-2" />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onPrint}
+            disabled={!hasDocument}
+            title="Print"
+            aria-label="Print document"
+            className="h-8 px-2.5 gap-1.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
+          >
+            <Printer className="w-4 h-4" />
+            <span className="hidden md:inline text-xs font-medium">Print</span>
+          </Button>
+
+          <div className="w-px h-5 bg-border mx-0.5 md:mx-1.5" aria-hidden="true" />
 
           <ThemeSwitcher />
-
-          <div className="w-px h-6 bg-border mx-1 md:mx-2 hidden md:block" />
-
-          <div className="hidden md:flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() =>
-                window.open(
-                  "https://github.com/devlinduldulao/pdf-editor",
-                  "_blank",
-                )
-              }
-              title="View on GitHub"
-            >
-              <Github className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() =>
-                window.open(
-                  "https://github.com/devlinduldulao/pdf-editor/issues",
-                  "_blank",
-                )
-              }
-              title="Report an issue"
-            >
-              <Bug className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
+        </nav>
       </header>
     );
   },

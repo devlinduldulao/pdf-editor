@@ -12,17 +12,8 @@ import SignaturePad from "@/components/SignaturePad";
 import { RedactionCanvas, type Redaction } from "@/components/RedactionTools";
 import WatermarkModal, { type WatermarkConfig } from "@/components/WatermarkModal";
 import HeaderFooterModal, { type HeaderFooterConfig } from "@/components/HeaderFooterModal";
-import PasswordProtectModal, { type PasswordProtectionConfig } from "@/components/PasswordProtectModal";
-// Nice-to-have feature imports
 import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal";
-import StickyNotesCanvas, { type StickyNoteAnnotation, type StickyNoteReply } from "@/components/StickyNotes";
-import LinkAnnotationsCanvas, { type LinkAnnotation } from "@/components/LinkAnnotations";
-import BookmarkEditor, { type BookmarkItem } from "@/components/BookmarkEditor";
 import ExportToImagesModal from "@/components/ExportToImagesModal";
-import CompressPDFModal from "@/components/CompressPDFModal";
-import OCRModal from "@/components/OCRModal";
-import DocumentComparison from "@/components/DocumentComparison";
-import FlattenAnnotationsModal from "@/components/FlattenAnnotationsModal";
 import {
   ChevronLeft,
   ChevronRight,
@@ -44,17 +35,9 @@ import {
   PenTool,
   Droplets,
   FileText,
-  Lock,
   MoreHorizontal,
   Keyboard,
-  StickyNote,
-  Link,
-  Bookmark,
   ImageDown,
-  FileArchive,
-  Scan,
-  GitCompare,
-  Stamp,
 } from "lucide-react";
 import type { ImageAnnotation } from "@/services/pdfEditor";
 
@@ -195,22 +178,11 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
   // Header/Footer state
   const [isHeaderFooterModalOpen, setIsHeaderFooterModalOpen] = useState(false);
 
-  // Password Protection state
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-
-  // Nice-to-have feature states
+  // Keyboard shortcuts state
   const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
-  const [stickyNotes, setStickyNotes] = useState<StickyNoteAnnotation[]>([]);
-  const [isStickyNotesMode, setIsStickyNotesMode] = useState(false);
-  const [linkAnnotations, setLinkAnnotations] = useState<LinkAnnotation[]>([]);
-  const [isLinkMode, setIsLinkMode] = useState(false);
-  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([]);
-  const [isBookmarkEditorOpen, setIsBookmarkEditorOpen] = useState(false);
+
+  // Export to Images state
   const [isExportImagesOpen, setIsExportImagesOpen] = useState(false);
-  const [isCompressOpen, setIsCompressOpen] = useState(false);
-  const [isOCROpen, setIsOCROpen] = useState(false);
-  const [isDocCompareOpen, setIsDocCompareOpen] = useState(false);
-  const [isFlattenOpen, setIsFlattenOpen] = useState(false);
 
   // Tools menu state (for mobile)
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
@@ -269,8 +241,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         setSelectedAnnotationId(null);
         setIsAddingText(false);
         setShowColorPicker(null);
-        setIsStickyNotesMode(false);
-        setIsLinkMode(false);
         setIsToolsMenuOpen(false);
       }
       // ? key: Show keyboard shortcuts
@@ -652,60 +622,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
       alert("Failed to apply header/footer");
     }
   }, []);
-
-  // Password protection handler
-  const handleApplyPasswordProtection = useCallback((config: PasswordProtectionConfig) => {
-    // Store the configuration - it will be applied when saving
-    // Note: pdf-lib has limited encryption support, so this is mainly for UI demonstration
-    console.log("Password protection configured:", config);
-    alert(`Password protection configured!\n\nNote: The document will be protected when you save it.\n\nOpen Password: ${config.openPassword.replace(/./g, '*')}`);
-  }, []);
-
-  // ========== Nice-to-have Feature Handlers ==========
-
-  // Sticky notes handlers
-  const handleAddStickyNote = useCallback((note: StickyNoteAnnotation) => {
-    saveToHistory("Add sticky note");
-    setStickyNotes((prev) => [...prev, note]);
-  }, [saveToHistory]);
-
-  const handleUpdateStickyNote = useCallback((id: string, updates: Partial<StickyNoteAnnotation>) => {
-    setStickyNotes((prev) =>
-      prev.map((note) => (note.id === id ? { ...note, ...updates } : note))
-    );
-  }, []);
-
-  const handleDeleteStickyNote = useCallback((id: string) => {
-    saveToHistory("Delete sticky note");
-    setStickyNotes((prev) => prev.filter((note) => note.id !== id));
-  }, [saveToHistory]);
-
-  const handleAddStickyNoteReply = useCallback((noteId: string, reply: StickyNoteReply) => {
-    setStickyNotes((prev) =>
-      prev.map((note) =>
-        note.id === noteId
-          ? { ...note, replies: [...note.replies, reply] }
-          : note
-      )
-    );
-  }, []);
-
-  // Link annotations handlers
-  const handleAddLink = useCallback((link: LinkAnnotation) => {
-    saveToHistory("Add link");
-    setLinkAnnotations((prev) => [...prev, link]);
-  }, [saveToHistory]);
-
-  const handleUpdateLink = useCallback((id: string, updates: Partial<LinkAnnotation>) => {
-    setLinkAnnotations((prev) =>
-      prev.map((link) => (link.id === id ? { ...link, ...updates } : link))
-    );
-  }, []);
-
-  const handleDeleteLink = useCallback((id: string) => {
-    saveToHistory("Delete link");
-    setLinkAnnotations((prev) => prev.filter((link) => link.id !== id));
-  }, [saveToHistory]);
 
   // Export to images handler
   const handleExportImages = useCallback(async (
@@ -1381,7 +1297,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             />
           </div>
 
-          {/* More Tools Dropdown - Outside overflow container so dropdown isn't clipped */}
+          {/* More Tools Dropdown */}
           <div className="relative shrink-0" data-tools-menu>
             <Button
                 variant="ghost"
@@ -1394,7 +1310,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                 <span className="text-xs hidden md:inline">More</span>
               </Button>
               {isToolsMenuOpen && (
-                <div className="absolute top-full left-0 mt-1 z-50 bg-card border border-border rounded-lg shadow-xl p-1 min-w-[180px] animate-in fade-in zoom-in-95 duration-100">
+                <div className="absolute top-full right-0 md:left-0 md:right-auto mt-1 z-50 bg-card border border-border rounded-lg shadow-xl p-1 min-w-[200px] animate-in fade-in zoom-in-95 duration-100">
+                  {/* Annotate group */}
+                  <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Annotate</div>
                   <button
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
                     onClick={() => {
@@ -1420,7 +1338,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                       </span>
                     )}
                   </button>
+
+                  {/* Page & Document group */}
                   <div className="h-px bg-border my-1" />
+                  <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Document</div>
                   <button
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
                     onClick={() => {
@@ -1429,7 +1350,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                     }}
                   >
                     <Search className="w-4 h-4" />
-                    Search (Ctrl+F)
+                    Search
+                    <span className="ml-auto text-[10px] text-muted-foreground/50">Ctrl+F</span>
                   </button>
                   <button
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
@@ -1449,74 +1371,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                     }}
                   >
                     <FileText className="w-4 h-4" />
-                    Header/Footer
+                    Header / Footer
                   </button>
+
+                  {/* Export group */}
                   <div className="h-px bg-border my-1" />
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsPasswordModalOpen(true);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <Lock className="w-4 h-4" />
-                    Password Protect
-                  </button>
-                  <div className="h-px bg-border my-1" />
-                  {/* Nice-to-have features */}
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsStickyNotesMode(!isStickyNotesMode);
-                      setIsLinkMode(false);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <StickyNote className="w-4 h-4" />
-                    {isStickyNotesMode ? "Exit Sticky Notes" : "Sticky Notes"}
-                    {stickyNotes.filter(n => n.pageNumber === currentPage).length > 0 && (
-                      <span className="ml-auto text-xs bg-amber-500/20 text-amber-600 px-1.5 rounded-full">
-                        {stickyNotes.filter(n => n.pageNumber === currentPage).length}
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsLinkMode(!isLinkMode);
-                      setIsStickyNotesMode(false);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <Link className="w-4 h-4" />
-                    {isLinkMode ? "Exit Link Mode" : "Add Links"}
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsBookmarkEditorOpen(true);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <Bookmark className="w-4 h-4" />
-                    Bookmarks
-                    {bookmarks.length > 0 && (
-                      <span className="ml-auto text-xs bg-primary/20 text-primary px-1.5 rounded-full">
-                        {bookmarks.length}
-                      </span>
-                    )}
-                  </button>
-                  <div className="h-px bg-border my-1" />
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsFlattenOpen(true);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <Stamp className="w-4 h-4" />
-                    Flatten Annotations
-                  </button>
+                  <div className="px-3 py-1.5 text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider">Export</div>
                   <button
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
                     onClick={() => {
@@ -1527,37 +1387,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                     <ImageDown className="w-4 h-4" />
                     Export to Images
                   </button>
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsCompressOpen(true);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <FileArchive className="w-4 h-4" />
-                    Compress PDF
-                  </button>
-                  <div className="h-px bg-border my-1" />
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsOCROpen(true);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <Scan className="w-4 h-4" />
-                    OCR Text Recognition
-                  </button>
-                  <button
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
-                    onClick={() => {
-                      setIsDocCompareOpen(true);
-                      setIsToolsMenuOpen(false);
-                    }}
-                  >
-                    <GitCompare className="w-4 h-4" />
-                    Compare Documents
-                  </button>
+
+                  {/* Utilities group */}
                   <div className="h-px bg-border my-1" />
                   <button
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left rounded hover:bg-muted transition-colors"
@@ -1568,7 +1399,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
                   >
                     <Keyboard className="w-4 h-4" />
                     Keyboard Shortcuts
+                    <span className="ml-auto text-[10px] text-muted-foreground/50">?</span>
                   </button>
+
+                  {/* Conditional: Clear Redactions */}
                   {redactions.filter(r => r.pageNumber === currentPage).length > 0 && (
                     <>
                       <div className="h-px bg-border my-1" />
@@ -1784,31 +1618,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
             scale={scale}
             isActive={isRedactionMode}
           />
-          {/* Sticky Notes Overlay */}
-          <StickyNotesCanvas
-            notes={stickyNotes}
-            currentPage={currentPage}
-            scale={scale}
-            canvasHeight={canvasSize.height}
-            isActive={isStickyNotesMode}
-            onAddNote={handleAddStickyNote}
-            onUpdateNote={handleUpdateStickyNote}
-            onDeleteNote={handleDeleteStickyNote}
-            onAddReply={handleAddStickyNoteReply}
-          />
-          {/* Link Annotations Overlay */}
-          <LinkAnnotationsCanvas
-            links={linkAnnotations}
-            currentPage={currentPage}
-            totalPages={numPages}
-            scale={scale}
-            canvasHeight={canvasSize.height}
-            isActive={isLinkMode}
-            onAddLink={handleAddLink}
-            onUpdateLink={handleUpdateLink}
-            onDeleteLink={handleDeleteLink}
-            onNavigateToPage={setCurrentPage}
-          />
         </div>
         </div>
       </div>
@@ -1853,26 +1662,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         totalPages={numPages}
       />
 
-      <PasswordProtectModal
-        isOpen={isPasswordModalOpen}
-        onClose={() => setIsPasswordModalOpen(false)}
-        onApply={handleApplyPasswordProtection}
-      />
-
-      {/* Nice-to-have feature modals */}
       <KeyboardShortcutsModal
         isOpen={isKeyboardShortcutsOpen}
         onClose={() => setIsKeyboardShortcutsOpen(false)}
-      />
-
-      <BookmarkEditor
-        isOpen={isBookmarkEditorOpen}
-        onClose={() => setIsBookmarkEditorOpen(false)}
-        bookmarks={bookmarks}
-        currentPage={currentPage}
-        totalPages={numPages}
-        onBookmarksChange={setBookmarks}
-        onNavigateToPage={setCurrentPage}
       />
 
       <ExportToImagesModal
@@ -1881,33 +1673,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         pdfDocument={pdfDocument}
         totalPages={numPages}
         onExport={handleExportImages}
-      />
-
-      <CompressPDFModal
-        isOpen={isCompressOpen}
-        onClose={() => setIsCompressOpen(false)}
-        fileName={file?.name || "document.pdf"}
-      />
-
-      <OCRModal
-        isOpen={isOCROpen}
-        onClose={() => setIsOCROpen(false)}
-        pdfDocument={pdfDocument}
-        currentPage={currentPage}
-        scale={scale}
-      />
-
-      <DocumentComparison
-        isOpen={isDocCompareOpen}
-        onClose={() => setIsDocCompareOpen(false)}
-        originalFile={file}
-        originalDocument={pdfDocument}
-      />
-
-      <FlattenAnnotationsModal
-        isOpen={isFlattenOpen}
-        onClose={() => setIsFlattenOpen(false)}
-        fileName={file?.name || "document.pdf"}
       />
     </div>
   );

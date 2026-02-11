@@ -2,16 +2,14 @@
  * Tests for the MenuBar component.
  *
  * MenuBar is the top header of the app. It contains:
- * - Logo/title
- * - Action buttons: New, Save, Print, Export (Save As)
+ * - Brand logo/title ("PDFEditor")
+ * - Action buttons: New, Save, Export, Print
  * - ThemeSwitcher (tested separately)
- * - GitHub/Bug report links
  *
  * Testing approach:
- * - Verify all buttons render
+ * - Verify all buttons render with correct accessible names
  * - Verify Save/Print/Export are disabled when `hasDocument` is false
  * - Verify callbacks fire on button click
- * - Verify external links open correctly
  *
  * Key concept: `memo()` — MenuBar is wrapped in `React.memo()` to prevent
  * unnecessary re-renders when parent state changes but the menu bar props
@@ -40,22 +38,33 @@ describe("MenuBar", () => {
     it("should render the app title", () => {
       render(<MenuBar {...defaultProps} />);
 
-      // The logo says "PDF" + "Editor" (or "E" on mobile)
       expect(screen.getByText("Editor")).toBeInTheDocument();
     });
 
     it("should render the New button", () => {
       render(<MenuBar {...defaultProps} />);
 
-      expect(screen.getByTitle("New")).toBeInTheDocument();
+      expect(screen.getByTitle("New document")).toBeInTheDocument();
     });
 
     it("should render Save, Print, and Export buttons", () => {
       render(<MenuBar {...defaultProps} />);
 
-      expect(screen.getByTitle("Save")).toBeInTheDocument();
-      expect(screen.getByTitle("Print PDF")).toBeInTheDocument();
-      expect(screen.getByTitle("Export")).toBeInTheDocument();
+      expect(screen.getByTitle("Save (download)")).toBeInTheDocument();
+      expect(screen.getByTitle("Print")).toBeInTheDocument();
+      expect(screen.getByTitle("Export as...")).toBeInTheDocument();
+    });
+
+    it("should render the header with banner role", () => {
+      render(<MenuBar {...defaultProps} />);
+
+      expect(screen.getByRole("banner")).toBeInTheDocument();
+    });
+
+    it("should render the nav with file actions label", () => {
+      render(<MenuBar {...defaultProps} />);
+
+      expect(screen.getByLabelText("File actions")).toBeInTheDocument();
     });
   });
 
@@ -63,25 +72,25 @@ describe("MenuBar", () => {
     it("should disable Save when hasDocument is false", () => {
       render(<MenuBar {...defaultProps} hasDocument={false} />);
 
-      expect(screen.getByTitle("Save")).toBeDisabled();
+      expect(screen.getByTitle("Save (download)")).toBeDisabled();
     });
 
     it("should disable Print when hasDocument is false", () => {
       render(<MenuBar {...defaultProps} hasDocument={false} />);
 
-      expect(screen.getByTitle("Print PDF")).toBeDisabled();
+      expect(screen.getByTitle("Print")).toBeDisabled();
     });
 
     it("should disable Export when hasDocument is false", () => {
       render(<MenuBar {...defaultProps} hasDocument={false} />);
 
-      expect(screen.getByTitle("Export")).toBeDisabled();
+      expect(screen.getByTitle("Export as...")).toBeDisabled();
     });
 
     it("should NOT disable the New button when hasDocument is false", () => {
       render(<MenuBar {...defaultProps} hasDocument={false} />);
 
-      expect(screen.getByTitle("New")).not.toBeDisabled();
+      expect(screen.getByTitle("New document")).not.toBeDisabled();
     });
   });
 
@@ -89,19 +98,19 @@ describe("MenuBar", () => {
     it("should enable Save when hasDocument is true", () => {
       render(<MenuBar {...defaultProps} hasDocument={true} />);
 
-      expect(screen.getByTitle("Save")).not.toBeDisabled();
+      expect(screen.getByTitle("Save (download)")).not.toBeDisabled();
     });
 
     it("should enable Print when hasDocument is true", () => {
       render(<MenuBar {...defaultProps} hasDocument={true} />);
 
-      expect(screen.getByTitle("Print PDF")).not.toBeDisabled();
+      expect(screen.getByTitle("Print")).not.toBeDisabled();
     });
 
     it("should enable Export when hasDocument is true", () => {
       render(<MenuBar {...defaultProps} hasDocument={true} />);
 
-      expect(screen.getByTitle("Export")).not.toBeDisabled();
+      expect(screen.getByTitle("Export as...")).not.toBeDisabled();
     });
   });
 
@@ -112,7 +121,7 @@ describe("MenuBar", () => {
 
       render(<MenuBar {...defaultProps} onNew={onNew} />);
 
-      await user.click(screen.getByTitle("New"));
+      await user.click(screen.getByTitle("New document"));
 
       expect(onNew).toHaveBeenCalledOnce();
     });
@@ -123,7 +132,7 @@ describe("MenuBar", () => {
 
       render(<MenuBar {...defaultProps} onSave={onSave} hasDocument={true} />);
 
-      await user.click(screen.getByTitle("Save"));
+      await user.click(screen.getByTitle("Save (download)"));
 
       expect(onSave).toHaveBeenCalledOnce();
     });
@@ -134,7 +143,7 @@ describe("MenuBar", () => {
 
       render(<MenuBar {...defaultProps} onPrint={onPrint} hasDocument={true} />);
 
-      await user.click(screen.getByTitle("Print PDF"));
+      await user.click(screen.getByTitle("Print"));
 
       expect(onPrint).toHaveBeenCalledOnce();
     });
@@ -145,39 +154,9 @@ describe("MenuBar", () => {
 
       render(<MenuBar {...defaultProps} onSaveAs={onSaveAs} hasDocument={true} />);
 
-      await user.click(screen.getByTitle("Export"));
+      await user.click(screen.getByTitle("Export as..."));
 
       expect(onSaveAs).toHaveBeenCalledOnce();
-    });
-  });
-
-  describe("external links", () => {
-    it("should have a GitHub link button", () => {
-      render(<MenuBar {...defaultProps} />);
-
-      expect(screen.getByTitle("View on GitHub")).toBeInTheDocument();
-    });
-
-    it("should have a report issue link button", () => {
-      render(<MenuBar {...defaultProps} />);
-
-      expect(screen.getByTitle("Report an issue")).toBeInTheDocument();
-    });
-
-    it("should open GitHub page when GitHub button is clicked", async () => {
-      const user = userEvent.setup();
-      const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
-
-      render(<MenuBar {...defaultProps} />);
-
-      await user.click(screen.getByTitle("View on GitHub"));
-
-      expect(openSpy).toHaveBeenCalledWith(
-        "https://github.com/devlinduldulao/pdf-editor",
-        "_blank",
-      );
-
-      openSpy.mockRestore();
     });
   });
 });
