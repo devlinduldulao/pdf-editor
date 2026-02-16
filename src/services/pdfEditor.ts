@@ -90,16 +90,16 @@ export class PDFEditorService {
           updateMetadata: false
         });
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("PDF Load Error:", error);
-      
-      const errorMsg = error.message?.toLowerCase() || '';
-      const errorName = error.constructor?.name || '';
+
+      const errorMsg = error instanceof Error ? error.message.toLowerCase() : "";
+      const errorName = error instanceof Error ? error.constructor.name : "";
       
       // Check if it's an EncryptedPDFError
       if (errorName === 'EncryptedPDFError' || errorMsg.includes('encrypted')) {
         // PDF is encrypted and needs a password
-        throw new Error('PDF_PASSWORD_REQUIRED');
+        throw new Error('PDF_PASSWORD_REQUIRED', { cause: error });
       }
       
       // Re-throw other errors as-is
@@ -220,7 +220,7 @@ export class PDFEditorService {
     const endY = pageHeight - shape.endY;
 
     switch (shape.tool) {
-      case "rectangle":
+      case "rectangle": {
         const width = shape.endX - shape.startX;
         const height = shape.startY - shape.endY; // Inverted since Y is flipped
         page.drawRectangle({
@@ -232,8 +232,9 @@ export class PDFEditorService {
           borderWidth: shape.strokeWidth,
         });
         break;
+      }
 
-      case "circle":
+      case "circle": {
         const radiusX = Math.abs(shape.endX - shape.startX) / 2;
         const radiusY = Math.abs(shape.endY - shape.startY) / 2;
         const centerX = shape.startX + (shape.endX - shape.startX) / 2;
@@ -247,6 +248,7 @@ export class PDFEditorService {
           borderWidth: shape.strokeWidth,
         });
         break;
+      }
 
       case "line":
         page.drawLine({
@@ -257,7 +259,7 @@ export class PDFEditorService {
         });
         break;
 
-      case "arrow":
+      case "arrow": {
         // Draw the line
         page.drawLine({
           start: { x: shape.startX, y: startY },
@@ -287,6 +289,7 @@ export class PDFEditorService {
           color: rgb(shapeColor.r, shapeColor.g, shapeColor.b),
         });
         break;
+      }
     }
   }
 
@@ -296,7 +299,7 @@ export class PDFEditorService {
     const form = this.pdfDoc.getForm();
     const fields = form.getFields();
 
-    const field = fields.find((f: any) => f.getName() === fieldName);
+    const field = fields.find((f: { getName: () => string }) => f.getName() === fieldName);
     if (field) {
       try {
         const textField = form.getTextField(fieldName);

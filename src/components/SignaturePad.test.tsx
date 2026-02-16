@@ -55,7 +55,8 @@ const createMockContext = () => ({
 // Override getContext on the prototype so all <canvas> elements use our mock
 const originalGetContext = HTMLCanvasElement.prototype.getContext;
 beforeEach(() => {
-  HTMLCanvasElement.prototype.getContext = vi.fn(() => createMockContext()) as any;
+  HTMLCanvasElement.prototype.getContext =
+    vi.fn(() => createMockContext()) as unknown as typeof HTMLCanvasElement.prototype.getContext;
   // Make toDataURL return a recognisable base64 string
   HTMLCanvasElement.prototype.toDataURL = vi.fn(() => "data:image/png;base64,MOCK");
 });

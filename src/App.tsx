@@ -27,16 +27,16 @@ function App() {
       setPendingFile(null);
       setError(null);
       return true;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error loading PDF:", error);
-      if (error.message === "PDF_PASSWORD_REQUIRED") {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage === "PDF_PASSWORD_REQUIRED") {
         setPendingFile(file);
         setIsPasswordPromptOpen(true);
         setIsPasswordError(!!password); // If we provided a password and it failed, it's an error
         return false;
       }
 
-      const errorMessage = error.message || String(error);
       if (errorMessage.includes("Invalid object ref") || errorMessage.includes("parse")) {
         setError("The PDF file structure is invalid or not supported.");
       } else {

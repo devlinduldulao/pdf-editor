@@ -14,7 +14,7 @@ import {
 interface ExportToImagesModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pdfDocument: any; // PDF.js document
+  pdfDocument: unknown; // Reserved for future PDF.js-backed preview features
   totalPages: number;
   onExport: (
     pages: number[],
@@ -25,7 +25,8 @@ interface ExportToImagesModalProps {
 }
 
 const ExportToImagesModal: React.FC<ExportToImagesModalProps> = memo(
-  ({ isOpen, onClose, pdfDocument: _pdfDocument, totalPages, onExport }) => {
+  ({ isOpen, onClose, pdfDocument, totalPages, onExport }) => {
+    void pdfDocument;
     const [format, setFormat] = useState<"png" | "jpeg">("png");
     const [quality, setQuality] = useState(92);
     const [scale, setScale] = useState(2);

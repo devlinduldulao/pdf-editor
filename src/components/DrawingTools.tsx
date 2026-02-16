@@ -258,7 +258,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = memo(({
           case "rectangle":
             ctx.strokeRect(startX, startY, endX - startX, endY - startY);
             break;
-          case "circle":
+          case "circle": {
             const radiusX = Math.abs(endX - startX) / 2;
             const radiusY = Math.abs(endY - startY) / 2;
             const centerX = startX + (endX - startX) / 2;
@@ -266,12 +266,13 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = memo(({
             ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
             ctx.stroke();
             break;
+          }
           case "line":
             ctx.moveTo(startX, startY);
             ctx.lineTo(endX, endY);
             ctx.stroke();
             break;
-          case "arrow":
+          case "arrow": {
             // Draw line
             ctx.moveTo(startX, startY);
             ctx.lineTo(endX, endY);
@@ -293,6 +294,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = memo(({
             );
             ctx.stroke();
             break;
+          }
         }
       });
 
@@ -329,7 +331,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = memo(({
             currentEndPoint.y - startPoint.y
           );
           break;
-        case "circle":
+        case "circle": {
           const radiusX = Math.abs(currentEndPoint.x - startPoint.x) / 2;
           const radiusY = Math.abs(currentEndPoint.y - startPoint.y) / 2;
           const centerX = startPoint.x + (currentEndPoint.x - startPoint.x) / 2;
@@ -337,12 +339,13 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = memo(({
           ctx.ellipse(centerX, centerY, radiusX, radiusY, 0, 0, 2 * Math.PI);
           ctx.stroke();
           break;
+        }
         case "line":
           ctx.moveTo(startPoint.x, startPoint.y);
           ctx.lineTo(currentEndPoint.x, currentEndPoint.y);
           ctx.stroke();
           break;
-        case "arrow":
+        case "arrow": {
           ctx.moveTo(startPoint.x, startPoint.y);
           ctx.lineTo(currentEndPoint.x, currentEndPoint.y);
           ctx.stroke();
@@ -365,6 +368,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = memo(({
           );
           ctx.stroke();
           break;
+        }
       }
     }
   }, [paths, shapes, currentPoints, startPoint, currentEndPoint, currentTool, currentColor, strokeWidth, pageNumber, scale, width, height]);

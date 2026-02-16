@@ -22,7 +22,6 @@ import {
   type TextAnnotation,
   type DrawingPath,
   type DrawingShape,
-  type ImageAnnotation,
 } from "@/services/pdfEditor";
 
 /**

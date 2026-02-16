@@ -20,4 +20,15 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    files: [
+      'src/components/ui/button.tsx',
+      'src/contexts/ThemeContext.tsx',
+      'src/testing/**/*.{ts,tsx}',
+      '**/*.test.{ts,tsx}',
+    ],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])

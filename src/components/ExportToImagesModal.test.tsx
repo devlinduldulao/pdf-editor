@@ -98,7 +98,6 @@ describe("ExportToImagesModal", () => {
   });
 
   it("should hide quality slider for PNG", async () => {
-    const user = userEvent.setup();
     renderModal();
 
     // Start with PNG (default) → no quality slider

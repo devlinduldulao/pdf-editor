@@ -92,7 +92,7 @@ describe("SearchBar", () => {
       const mockDoc = createMockPDFDocument(1);
 
       render(
-        <SearchBar {...defaultProps} pdfDocument={mockDoc as any} isOpen={true} />,
+        <SearchBar {...defaultProps} pdfDocument={mockDoc} isOpen={true} />,
       );
 
       await user.type(
@@ -113,7 +113,7 @@ describe("SearchBar", () => {
       const mockDoc = createMockPDFDocument(2);
 
       render(
-        <SearchBar {...defaultProps} pdfDocument={mockDoc as any} isOpen={true} />,
+        <SearchBar {...defaultProps} pdfDocument={mockDoc} isOpen={true} />,
       );
 
       await user.type(

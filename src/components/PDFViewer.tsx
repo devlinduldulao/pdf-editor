@@ -69,6 +69,28 @@ interface TextAnnotation {
   isItalic?: boolean;
 }
 
+interface PdfJsAnnotation {
+  subtype?: string;
+  fieldType?: string;
+  fieldName?: string;
+  rect: number[];
+  fieldValue?: string;
+}
+
+interface PdfJsPage {
+  getAnnotations(): Promise<PdfJsAnnotation[]>;
+  getViewport(params: { scale: number }): { height: number; width: number };
+  render(params: {
+    canvasContext: CanvasRenderingContext2D;
+    viewport: { height: number; width: number };
+  }): { promise: Promise<void> };
+}
+
+interface PdfJsDocument {
+  numPages: number;
+  getPage(pageNumber: number): Promise<PdfJsPage>;
+}
+
 // Preset colors for text
 const TEXT_COLORS = [
   { name: "Black", value: "#000000" },
@@ -131,11 +153,14 @@ const FormFieldComponent = memo(
 FormFieldComponent.displayName = "FormFieldComponent";
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
+  const getErrorMessage = (error: unknown) =>
+    error instanceof Error ? error.message : String(error);
+
   const canvasRef = useRef<HTMLDivElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [pdfDocument, setPdfDocument] = useState<any>(null);
+  const [pdfDocument, setPdfDocument] = useState<PdfJsDocument | null>(null);
   const [scale, setScale] = useState<number>(1.5);
   const [formFields, setFormFields] = useState<FormField[]>([]);
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
@@ -304,7 +329,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     if (!file) return;
 
     const loadPDF = async () => {
-      const attemptLoad = async (password?: string): Promise<any> => {
+      const attemptLoad = async (password?: string): Promise<PdfJsDocument> => {
         const arrayBuffer = await file.arrayBuffer();
 
         // Get the password from the service if it was already provided
@@ -317,7 +342,10 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
         });
 
         // Handle password requests from PDF.js
-        loadingTask.onPassword = (updatePassword: any, reason: number) => {
+        loadingTask.onPassword = (
+          updatePassword: (password: string) => void,
+          reason: number,
+        ) => {
           if (reason === 1) {
             // Need password - but if service already has it, don't prompt again
             if (servicePassword) {
@@ -398,7 +426,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
     e.target.value = "";
   };
 
-  const extractFormFields = async (pdf: any) => {
+  const extractFormFields = async (pdf: PdfJsDocument) => {
     const fields: FormField[] = [];
     console.log("🔍 Extracting form fields from PDF...");
 
@@ -408,7 +436,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
 
       console.log(`Page ${pageNum}: Found ${annotations.length} annotations`);
 
-      annotations.forEach((annotation: any, index: number) => {
+      annotations.forEach((annotation: PdfJsAnnotation, index: number) => {
         console.log(`Annotation ${index}:`, {
           type: annotation.subtype,
           fieldType: annotation.fieldType,
@@ -731,9 +759,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
       alert(
         `Changes applied! ${totalItems} item(s) added. Click Save to download.`,
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error applying changes:", error);
-      alert(`Failed to apply changes: ${error.message || error}`);
+      alert(`Failed to apply changes: ${getErrorMessage(error)}`);
     }
   };
 
@@ -1077,7 +1105,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ file }) => {
 
         <Input
           value={annotation.text}
-          onChange={(e: any) => handleTextChange(annotation.id, e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleTextChange(annotation.id, e.target.value)
+          }
           style={{
             fontSize: `${annotation.fontSize}px`,
             fontWeight: annotation.isBold ? "bold" : "normal",
